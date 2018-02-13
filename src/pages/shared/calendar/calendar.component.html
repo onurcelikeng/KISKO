@@ -1,0 +1,271 @@
+<section class="content-header">
+  <h1>
+    Randevu
+    <small>Randevu Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Randevu</li>
+  </ol>
+</section>
+
+<section class="content">     
+  <div class="row">
+
+    <!-- Left Menu -->
+    <div class="col-md-3">
+      <!-- Appointment Types -->
+      <div class="box box-solid">
+        <div class="box-header with-border">
+          <h3 class="box-title">Randevu Türü</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="card">
+            <div class="card-body">
+              <li *ngFor="let event of appointments" mwlDraggable [dropData]="{event: event}" style="position:relative; z-index: 10; list-style-type: none">
+                <div [class]="event.class">
+                  <a style="color: white">
+                    {{ event.title }}
+                  </a>
+                </div>    
+              </li>      
+            </div>
+          </div>
+
+          <div *ngIf="appointments.length == 0">
+            <label><i>Randevu türü bulunamadı.</i></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Day's Events -->
+      <div class="box box-solid">
+        <div class="box-header with-border">
+          <h3 class="box-title">{{ selectedDay }} Randevuları</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button type="button" title="Yeni Randevu" data-toggle="modal" data-target="#addCalendarEventModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>     
+              <button type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            </div>
+          </div>
+
+          <div class="table-responsive mailbox-messages">
+            <table datatable [dtTrigger]="eventDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of eventArray">
+                  <td width="95%" (click)="getCalendarEventDetail(row.randevuid)" style="vertical-align:middle;">{{ row.aciklama }}</td>                  
+                  <td width="5%" (click)="getCalendarEventDetail(row.randevuid)" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="eventArray.length == 0">
+            <label><i>Bugün herhangi bir randevunuz yok.</i></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="col-md-9">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="btn-group">
+                <div class="btn btn-default" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate" (viewDateChange)="activeDayIsOpen = false"> <i class="fa fa-chevron-left"></i> </div>
+                <div class="btn btn-default" mwlCalendarToday [(viewDate)]="viewDate"> Bugün </div>
+                <div class="btn btn-default" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate" (viewDateChange)="activeDayIsOpen = false"> <i class="fa fa-chevron-right"></i> </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}</h3>
+            </div>
+            <div class="col-md-4">
+              <div class="btn-group">
+                <div class="btn btn-default" (click)="view = 'month'" [class.active]="view === 'month'"> Ay </div>
+                <div class="btn btn-default" (click)="view = 'week'" [class.active]="view === 'week'"> Hafta </div>
+                <div class="btn btn-default" (click)="view = 'day'" [class.active]="view === 'day'"> Gün </div>
+              </div>
+            </div>
+          </div>
+          <br>
+
+          <ng-template #customCellTemplate let-day="day" let-locale="locale">
+            <div class="cal-cell-top">
+              <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+            </div>
+            <div class="cell-totals">
+              <span 
+                *ngFor="let group of day.eventGroups"
+                class="badge badge-{{ group[0] }}"
+                [ngStyle]="setStyles(group[1][0].style)">
+                {{ group[1].length }}
+              </span>
+            </div>
+          </ng-template>
+
+          <div [ngSwitch]="view">
+            <mwl-calendar-month-view
+              *ngSwitchCase="'month'"
+              [viewDate]="viewDate"
+              [events]="events"
+              [locale]="locale"
+              [weekStartsOn]="weekStartsOn"
+              [weekendDays]="weekendDays"
+              [activeDayIsOpen]="false"
+              [refresh]="refresh"
+              [cellTemplate]="customCellTemplate"
+              (beforeViewRender)="beforeMonthViewRender($event)"
+              (dayClicked)="dayClicked($event.day)"
+              (eventClicked)="handleEvent('Clicked', $event.event)"
+              (eventTimesChanged)="eventDropped($event)"
+              (eventTimesChanged)="eventTimesChanged($event)">
+            </mwl-calendar-month-view>
+
+            <mwl-calendar-week-view
+              *ngSwitchCase="'week'"
+              [viewDate]="viewDate"
+              [events]="events"
+              [locale]="locale"
+              [weekStartsOn]="weekStartsOn"
+              [weekendDays]="weekendDays"
+              [refresh]="refresh"
+              (eventClicked)="handleEvent('Clicked', $event.event)"
+              (eventTimesChanged)="eventTimesChanged($event)"
+              (eventTimesChanged)="eventDropped($event)">
+            </mwl-calendar-week-view>
+
+            <mwl-calendar-day-view
+              *ngSwitchCase="'day'"
+              [viewDate]="viewDate"
+              [events]="events"
+              [locale]="locale"
+              [refresh]="refresh"
+              (eventClicked)="handleEvent('Clicked', $event.event)"
+              (eventTimesChanged)="eventTimesChanged($event)"
+              (eventTimesChanged)="eventDropped($event)">
+            </mwl-calendar-day-view>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Calendar Event -->
+    <div class="modal modal-default fade" id="addCalendarEventModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Yeni Randevu</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+
+              <div class="form-group col-md-12">
+                <label>Randevu Tipi</label>
+                <select class="form-control" #selectElem [(ngModel)]="selectedAppointmentType">
+                  <option *ngFor="let row of appointmentTypeArray" [ngValue]="row">
+                    {{ row.isim }}
+                  </option>
+                </select>
+              </div>              
+
+              <div class="form-group col-md-6">
+                <label>Başlangıç</label>   
+                <angular2-date-picker 
+                  [(ngModel)]="eventStartDate" 
+                  [settings]="calendarSettings">
+                </angular2-date-picker>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Bitiş</label> 
+                <angular2-date-picker 
+                  [(ngModel)]="eventFinishDate" 
+                  [settings]="calendarSettings">
+                </angular2-date-picker>
+              </div>
+
+              <div class="form-group col-md-12">
+                <label>Açıklama</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="eventCredentials.aciklama"></textarea>                     
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('addCalendarEventModal')" type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addCalendarEvent()" type="button" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Calendar Event -->
+    <div class="modal modal-default fade" id="updateCalendarEventModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Randevu Düzenle</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+
+              <div class="form-group col-md-12">
+                <label>Randevu Tipi</label>
+                <select class="form-control" #selectElem [(ngModel)]="eventCredentials.randevutipiadi" name="randevutipiadi">
+                  <option *ngFor="let type of appointmentTypeArray" [ngValue]="eventCredentials.randevutipiadi">
+                    {{ type.isim }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Başlangıç</label>
+                <angular2-date-picker 
+                  [(ngModel)]="eventStartDate" 
+                  [settings]="calendarSettings">
+                </angular2-date-picker>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Bitiş</label>
+                <angular2-date-picker 
+                  [(ngModel)]="eventFinishDate" 
+                  [settings]="calendarSettings">
+                </angular2-date-picker>
+              </div>
+
+              <div class="form-group col-md-12">
+                <label>Açıklama</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="eventCredentials.aciklama">{{ (event | async)?.aciklama }}</textarea>                     
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-left">
+              <button (click)="deleteCalendarEvent()" type="button" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>
+            </div>
+            <div class="pull-right">
+              <button (click)="closeModal('updateCalendarEventModal')" type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateCalendarEvent()" type="button" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

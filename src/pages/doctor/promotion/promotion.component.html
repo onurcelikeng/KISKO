@@ -1,0 +1,190 @@
+<section class="content-header">
+  <h1>
+    Tanıtım
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Tanıtım</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <div class="col-md-3">
+      <div class="box box-primary">
+        <div class="box-body box-profile">
+          <img class="profile-user-img img-responsive img-circle" style="height: 100px; width: 100px" src="{{ (doctor | async)?.fotourl }}">
+          <h3 class="profile-username text-center"></h3>
+          <ul class="list-group list-group-unbordered">
+            <li class="list-group-item">
+              <b>Doktor</b> <a class="pull-right">{{ (doctor | async)?.unvan }} {{ (doctor | async)?.name }} {{ (doctor | async)?.surname }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>Uzmanlık</b> <a class="pull-right">{{ (doctor | async)?.bransadi }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>Website</b> <a href="{{ doctorUrl }}" class="pull-right">{{ doctorUrl }}</a>
+            </li>
+          </ul>
+
+          <div class="pull-right">
+            <a (click)="updateDoctorInfo()" class="btn btn-primary btn-sm btn-block"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#education" data-toggle="tab">Eğitim Bilgileri</a></li>
+          <li><a href="#history" data-toggle="tab">Özgeçmiş</a></li>
+          <li><a href="#contact" data-toggle="tab">İletişim</a></li>     
+        </ul>
+
+        <div class="tab-content">   
+          
+          <div class="tab-pane box box-solid active" id="education">
+            <div class="box-body">  
+
+              <div class="col-md-12">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Mezun Olduğu Okul</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.mezuniyetkurumu }}" [(ngModel)]="credentials.mezuniyetkurumu"/>           
+                  </div>
+                </div>
+  
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Mezuninet Tarihi</label>
+                    <my-date-picker
+                      [options]="datePickerOptions"
+                      [(ngModel)]="credentials.mezuniyettarihi">
+                    </my-date-picker>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Uzmanlık Aldığı Kurum</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.uzmanlikkurumu }}" [(ngModel)]="credentials.uzmanlikkurumu"/>            
+                  </div>
+                </div>
+  
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Uzmanlık Tarihi</label>
+                    <my-date-picker
+                      [options]="datePickerOptions"
+                      [(ngModel)]="credentials.uzmanliktarihi">
+                    </my-date-picker>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Unvan</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.unvan }}" [(ngModel)]="credentials.unvan"/>          
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Branş</label>
+                    <input type="text" class="form-control" disabled autocomplete="off" value="{{ (doctor | async)?.bransadi }}" [(ngModel)]="credentials.bransadi"/>          
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          
+          <div class="tab-pane box box-solid" id="history">
+            <div class="box-body">
+              <div class="col-md-12">
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Özgeçmiş</label>
+                    <textarea class="form-control" rows="5" [(ngModel)]="credentials.aciklama">{{ (doctor | async)?.aciklama }}</textarea>                  
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane box box-solid" id="contact">
+            <div class="box-body">
+  
+              <div class="col-md-12">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Telefon 1</label>
+                    <input type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" autocomplete="off" value="{{ (doctor | async)?.tel1 }}" [(ngModel)]="credentials.tel1"/>     
+                  </div>
+                </div>
+  
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Telefon 2</label>
+                    <input type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" autocomplete="off" value="{{ (doctor | async)?.tel2 }}" [(ngModel)]="credentials.tel2"/>         
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Telefon 3</label>
+                    <input type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" autocomplete="off" value="{{ (doctor | async)?.tel3 }}" [(ngModel)]="credentials.tel3"/>          
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>E-Posta</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.eposta }}" [(ngModel)]="credentials.eposta"/>           
+                  </div>
+                </div>
+  
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Web Sitesi</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.website }}" [(ngModel)]="credentials.website"/>           
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Web Sayfanızın Rumuzu</label>
+                    <input type="text" class="form-control" autocomplete="off" value="{{ (doctor | async)?.tag }}" [(ngModel)]="credentials.tag"/>           
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>İş Adresi</label>
+                      <textarea class="form-control" rows="3" [(ngModel)]="credentials.adres">{{ (doctor | async)?.adres }}</textarea>                         
+                    </div>
+                  </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        
+      </div>
+    </div>
+
+  </div>
+</section>

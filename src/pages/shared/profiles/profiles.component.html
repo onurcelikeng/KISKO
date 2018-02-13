@@ -1,0 +1,156 @@
+<section class="content-header">
+  <h1>
+      Profil
+  </h1>
+  <ol class="breadcrumb">
+      <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+      <li class="active">Profil</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <div class="col-md-3">
+        <div class="box box-primary">
+            <div class="box-body box-profile">
+                <div class="btn btn-default btn-sm btn-file pull-right">
+                    <i class="fa fa-camera"></i> 
+                    <input title="Fotoğraf Yükle" type="file" (change)="fileChange($event)" name="attachment">
+                </div>
+                <img class="profile-user-img img-responsive img-circle" style="height: 100px; width: 100px" src="{{ (user | async)?.photourl }}">
+                <h3 class="profile-username text-center"></h3>
+                <ul class="list-group list-group-unbordered">
+                    <li class="list-group-item">
+                        <b>TC Kimlik No</b> <a class="pull-right">{{ (user | async)?.tckimlik }}</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Adı</b> <a class="pull-right">{{ (user | async)?.name }}</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Soyadı</b> <a class="pull-right">{{ (user | async)?.surname }}</a>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Rollerim</strong>
+                        <p>
+                            <span *ngIf="isAdmin" class="label label-danger">Admin</span>
+                            <span *ngIf="isDoctor" class="label label-primary">Doktor</span>
+                            <span *ngIf="isSecretary" class="label label-success">Sekreter</span>
+                            <span *ngIf="isLab" class="label label-warning">Lab</span>
+                        </p>
+                    </li>
+                </ul>
+                <div class="pull-right">
+                    <a (click)="updateUser()" class="btn btn-primary btn-sm btn-block"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Hesap Bilgilerim</h3>
+            </div>
+            <div class="box-body">  
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>İsim</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.name }}" [(ngModel)]="credentials.name"/>        
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Soyisim</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.surname }}" [(ngModel)]="credentials.surname"/>           
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Meslek</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.meslek }}" [(ngModel)]="credentials.meslek"/>           
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Doğum Tarihi</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.birthdate }}" [(ngModel)]="credentials.birthdate"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Doğum Yeri</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.birthplace }}" [(ngModel)]="credentials.birthplace"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Cinsiyet</label>
+                            <select class="form-control" #selectElem [(ngModel)]="credentials.gender" name="gender">
+                                <option *ngFor="let gender of genders" [value]="gender">
+                                    {{ gender }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>E-posta</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.email }}" [(ngModel)]="credentials.email"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Cep Telefonu</label>
+                            <input type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" autocomplete="off" value="{{ (user | async)?.cellphone }}" [(ngModel)]="credentials.cellphone"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Ev Telefonu</label>
+                            <input type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" autocomplete="off" value="{{ (user | async)?.homephone }}" [(ngModel)]="credentials.homephone"/>            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Şehir</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.city }}" [(ngModel)]="credentials.city"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Ülke</label>
+                            <input type="text" class="form-control" autocomplete="off" value="{{ (user | async)?.country }}" [(ngModel)]="credentials.country"/>            
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Adres</label>
+                            <textarea class="form-control" rows="3" [(ngModel)]="credentials.address">{{ (user | async)?.address }}</textarea>                  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</section>

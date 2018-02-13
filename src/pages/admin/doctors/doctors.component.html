@@ -1,0 +1,422 @@
+<section class="content-header">
+  <h1>
+    Doktorlar
+    <small>Doktor Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Doktorlar</li>
+  </ol> 
+</section>
+
+<section class="content">     
+  <div class="row">
+    
+    <!-- Doctors -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>
+          <div class="box-tools pull-right">
+            <div class="has-feedback">
+              <form (keydown)="search($event)">
+                <input id="value" name="value" type="text" #value="ngModel" [(ngModel)]="searchCredentials.value" class="form-control input-sm" placeholder="Ara">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" class="btn btn-default btn-sm"><input type="checkbox" [(ngModel)]="isAllSelected" (change)="selectAll($event);"/></button>
+            <button (click)="openAddPanel()" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button (click)="reloadData()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            <button (click)="notificationClick()" data-toggle="modal" data-target="#sendNotificationModal" type="button" class="btn btn-default btn-sm"><i class="fa fa-envelope"></i></button>                  
+            
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>  
+                  <th></th>                
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
+                  <td width="5%"><input type="checkbox" (change)="change($event, row, i)" [(ngModel)]="selectedValues[i]"></td>
+                  <td width="90%" (click)="openEditPanel(row.doktortc)" style="vertical-align:middle;">{{ row.name }} {{ row.surname }}</td>
+                  <td width="5%"style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>                                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Update Doctor -->
+    <div [hidden]="!updateSelected" class="col-md-8">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Doktor Güncelleme</h3>
+        </div>
+        <div class="box-body">
+          <div class="box">
+
+            <div class="box-header with-border">
+              <h3 class="box-title">Kimlik Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+
+              <div class="col-md-6">
+                <div class="form-group col-md-6">
+                  <label>Doktor Tc</label>
+                  <input id="tc" name="tc" type="text" class="form-control" #tc="ngModel" disabled required [(ngModel)]="updateCredentials.tc" value="{{ (doctor | async)?.tc }}"/>           
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Adı</label>
+                  <input id="name" name="name" type="text" class="form-control" #name="ngModel" required [(ngModel)]="updateCredentials.name" (change)="inputOnChange()" value="{{ (doctor | async)?.name }}"/>           
+                </div>
+  
+                <div class="form-group col-md-6">
+                  <label>Cinsiyeti</label>
+                  <input id="gender" name="gender" type="text" class="form-control" #gender="ngModel" disabled required [(ngModel)]="updateCredentials.gender"/>           
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group col-md-10">
+                  <label>Profil Resmi</label>
+                  <input type="file" (change)="fileChange($event)" class="form-control" placeholder="Upload file" name="photourl">
+                </div>
+
+                <div id="preview" class="img-responsive img-circle preview col-md-2">
+                  <img width="50px" height="50px" src="{{ updateCredentials.fotourl }}">
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Soyadı</label>
+                  <input id="surname" name="surname" type="text" class="form-control" #surname="ngModel" required [(ngModel)]="updateCredentials.surname" (change)="inputOnChange()" value="{{ (doctor | async)?.surname }}"/>           
+                </div>
+              </div>
+          
+            </div>
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">İletişim Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+              <div class="form-group col-md-6">
+                <label>Eposta</label>
+                <input id="email" name="email" type="text" class="form-control" #email="ngModel" required [(ngModel)]="updateCredentials.email" (change)="inputOnChange()" value="{{ (doctor | async)?.email }}"/>           
+              </div>
+                
+              <div class="form-group col-md-6">
+                <label>Website</label>
+                <input id="website" name="website" type="text" class="form-control" #website="ngModel" required [(ngModel)]="updateCredentials.website" (change)="inputOnChange()" value="{{ (doctor | async)?.website }}"/>           
+              </div>
+
+              <div class="form-group col-md-3">
+                <label>Telefon 1</label>
+                <input id="telephone1" name="telephone1" type="text" class="form-control" #telephone1="ngModel" required [(ngModel)]="updateCredentials.tel1" (change)="inputOnChange()" value="{{ (doctor | async)?.telephone1 }}"/>           
+              </div>
+
+              <div class="form-group col-md-3">
+                <label>Telefon 2</label>
+                <input id="telephone2" name="telephone2" type="text" class="form-control" #telephone2="ngModel" required [(ngModel)]="updateCredentials.tel2" (change)="inputOnChange()" value="{{ (doctor | async)?.telephone2 }}"/>           
+              </div>
+
+              <div class="form-group col-md-3">
+                <label>Telefon 3</label>
+                <input id="telephone3" name="telephone3" type="text" class="form-control" #telephone3="ngModel" required [(ngModel)]="updateCredentials.tel3" (change)="inputOnChange()" value="{{ (doctor | async)?.telephone3 }}"/>           
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">Tanıtım</h3>
+            </div>
+
+            <div class="box-body">
+              <div class="form-group col-md-6">
+                <label>Açıklama</label>
+                <textarea id="aciklama" name="aciklama" rows="4" type="text" class="form-control" #aciklama="ngModel" required [(ngModel)]="updateCredentials.aciklama" (change)="inputOnChange()" value="{{ (doctor | async)?.aciklama }}"></textarea>           
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">Eğitim/Kurum Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+              <div class="col-md-6">
+                <div class="form-group col-md-6">
+                  <label>Kurum Id</label>
+                  <input id="kurumid" name="kurumid" type="text" class="form-control" #kurumid="ngModel" required [(ngModel)]="updateCredentials.kurumid" (change)="inputOnChange()" value="{{ (doctor | async)?.kurumid }}"/>           
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Branş Id</label>
+                  <input id="bransid" name="bransid" type="text" class="form-control" #bransid="ngModel" required [(ngModel)]="updateCredentials.bransid" (change)="inputOnChange()" value="{{ (doctor | async)?.bransid }}"/>           
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Uzmanlik Kurumu</label>
+                  <input id="uzmanlikkurumu" name="uzmanlikkurumu" type="text" class="form-control" #uzmanlikkurumu="ngModel" required [(ngModel)]="updateCredentials.uzmanlikkurumu" (change)="inputOnChange()" value="{{ (doctor | async)?.uzmanlikkurumu }}"/>           
+                </div>
+  
+                <div class="form-group col-md-12">
+                  <label>Mezuniyet Kurumu</label>
+                  <input id="mezuniyetkurumu" name="mezuniyetkurumu" type="text" class="form-control" #mezuniyetkurumu="ngModel" required [(ngModel)]="updateCredentials.mezuniyetkurumu" (change)="inputOnChange()" value="{{ (doctor | async)?.mezuniyetkurumu }}"/>           
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group col-md-6">
+                  <label>Diploma Belge Id</label>
+                  <input id="diplomabelgeid" name="diplomabelgeid" type="text" class="form-control" #diplomabelgeid="ngModel" required [(ngModel)]="updateCredentials.diplomabelgeid" (change)="inputOnChange()" value="{{ (doctor | async)?.diplomabelgeid }}"/>           
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Mezuniyet Tarihi</label>
+                  <my-date-picker
+                    [options]="datePickerOptions"
+                    [(ngModel)]="mezuniyetTarihiUpdate">
+                  </my-date-picker>
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Uzmanlık Tarihi</label>
+                  <my-date-picker
+                    [options]="datePickerOptions"
+                    [(ngModel)]="uzmanlikTarihiUpdate">
+                  </my-date-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-left">
+              <button (click)="deleteDoctor(updateCredentials.name, updateCredentials.tc)" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateDoctor()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>  
+      </div>
+    </div>
+
+    <!-- Add Doctor -->
+    <div [hidden]="!addSelected" class="col-md-8">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Doktor Ekleme</h3>
+        </div>
+        <div class="box-body">
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">Kimlik Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+
+              <div class="form-group col-md-6">
+                <label>Doktor Tc</label>
+                <input id="tc" name="tc" type="text" class="form-control" #tc="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.tc"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Adı</label>
+                <input id="name" name="name" type="text" class="form-control" #name="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.name"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Soyadı</label>
+                <input id="surname" name="surname" type="text" class="form-control" #surname="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.surname"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Cinsiyeti</label>
+                <input id="gender" name="gender" type="text" class="form-control" #gender="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.gender"/>           
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">İletişim Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+
+              <div class="form-group col-md-6">
+                <label>Eposta</label>
+                <input id="email" name="email" type="text" class="form-control" #email="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.email"/>           
+              </div>
+                
+              <div class="form-group col-md-6">
+                <label>Website</label>
+                <input id="website" name="website" type="text" class="form-control" #website="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.website"/>           
+              </div>
+
+            </div>  
+
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">Tanıtım</h3>
+            </div>
+            
+            <div class="box-body">
+
+              <div class="form-group col-md-6">
+                <label>Açıklama</label>
+                <input id="aciklama" name="aciklama" type="text" class="form-control" #aciklama="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.aciklama"/>           
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="box">
+              
+            <div class="box-header with-border">
+              <h3 class="box-title">Eğitim/Kurum Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+              <div class="form-group col-md-6">
+                <label>Kurum Id</label>
+                <input id="kurumid" name="kurumid" type="text" class="form-control" #kurumid="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.kurumid"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Branş Id</label>
+                <input id="bransid" name="bransid" type="text" class="form-control" #bransid="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.bransid"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Diploma Belge Id</label>
+                <input id="diplomabelgeid" name="diplomabelgeid" type="text" class="form-control" #diplomabelgeid="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.diplomabelgeid"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Mezuniyet Tarihi</label>
+                <input id="mezuniyettarihi" name="mezuniyettarihi" type="text" class="form-control" #mezuniyettarihi="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.mezuniyettarihi"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Uzmanlık Tarihi</label>
+                <input id="uzmanliktarihi" name="uzmanliktarihi" type="text" class="form-control" #uzmanliktarihi="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.uzmanliktarihi"/>           
+              </div>
+              
+              <div class="form-group col-md-6">
+                <label>Uzmanlik Kurumu</label>
+                <input id="uzmanlikkurumu" name="uzmanlikkurumu" type="text" class="form-control" #uzmanlikkurumu="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.uzmanlikkurumu"/>           
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Mezuniyet Kurumu</label>
+                <input id="mezuniyetkurumu" name="mezuniyetkurumu" type="text" class="form-control" #mezuniyetkurumu="ngModel" required (change)="inputOnChange()" [(ngModel)]="addCredentials.mezuniyetkurumu"/>           
+              </div>
+
+            </div>
+          </div>
+
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addDoctor()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send Notification -->
+    <div class="modal modal-default fade" id="sendNotificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Yeni Bildirim</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Kime</label>
+                    <textarea type="text" class="form-control" name="othertckimlik" required disabled [(ngModel)]="sendNotificationCredentials.header"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Başlık*</label>
+                    <input type="text" class="form-control" name="title" [(ngModel)]="sendNotificationCredentials.title" required>
+                  </div>
+      
+                  <div class="form-group">
+                    <label>İçerik*</label>
+                    <textarea class="form-control" name="message" rows="3" [(ngModel)]="sendNotificationCredentials.message" required></textarea>                  
+                  </div>
+
+                  <div class="form-group">
+                    <div>
+                        <label>Mesaj Tipi*</label>
+                    </div>
+                    <select class="form-control" #selectElem [compareWith]="compareFn" [(ngModel)]="messageType" name="type">
+                      <option *ngFor="let type of messageTypeArray" [value]="type">
+                          {{type}}
+                      </option>
+                    </select>
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" (click)="sendNotification()" class="btn btn-primary">Gönder</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

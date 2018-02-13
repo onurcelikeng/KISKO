@@ -1,0 +1,109 @@
+<section class="content-header">
+  <h1>
+    Makaleler
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Makaleler</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <!-- Articles -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <div class="btn-group">
+              <button type="button" data-toggle="modal" data-target="#articleUploadModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+              <button (click)="getArticles()" title="Yenile" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            </div>
+            
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows">
+                  <td width="%95" (click)="getArticle(row.medyaid)" style="vertical-align:middle;"> 
+                    <h4>
+                      {{ row.baslik }}
+                      <small class="pull-right"><i class="fa fa-clock-o"></i> {{ row.gondermetarihi }}</small>
+                    </h4>
+                    <p>{{ row.aciklama }}</p>
+                    <div style="margin-top: 20px">
+                      <small style="color: #336699" class="pull-left"><i class="glyphicon glyphicon-thumbs-up"></i> {{ row.begenme }}</small>
+                      <small style="color: #336699; margin-left: 15px" class="pull-left"><i class="glyphicon glyphicon-eye-open"></i> {{ row.goruntuleme }}</small>
+                      <small style="color: #336699; margin-left: 15px" class="pull-left"><a href="{{row.url}}"><i class="fa fa-leanpub"></i> Oku</a></small>
+                    </div>
+                  </td>
+                  <td width="5%" style="vertical-align: middle"><i (click)="deleteRequest(row.medyaid)" class="glyphicon glyphicon-trash" style="color: red"></i></td>                                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Makaleniz bulunmamaktadır.</i></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Article Uplaod -->
+    <div class="modal modal-default fade" id="articleUploadModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div [hidden]="!isProgressBar" class="progress progress-sm active">
+            <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            </div>
+          </div>
+          <div class="modal-header">
+            <h4 class="modal-title">Makale Yükleme</h4>
+          </div>
+          <div class="modal-body">
+            <form role="form" method="post">
+              <div class="box-body">
+
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" class="form-control" name="baslik" [(ngModel)]="credentials.baslik">
+                </div>
+
+                <div class="form-group">
+                  <label>Açıklama</label>
+                  <input type="text" class="form-control" name="aciklama" [(ngModel)]="credentials.aciklama">
+                </div>
+
+                <div class="form-group">
+                  <label>Dosya</label>
+                  <input type="file" (change)="fileChange($event)" class="form-control" placeholder="Upload file" name="document">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('articleUploadModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="uploadArticle()" type="button" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Yükle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

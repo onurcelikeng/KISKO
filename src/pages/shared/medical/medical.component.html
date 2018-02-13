@@ -1,0 +1,802 @@
+<section class="content-header" style="margin-top: -20px">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="input-group col-xs-12" style="margin-top: 25px">
+        <input name="value" type="text" class="form-control" (keyup.enter)="searchPatient()" [(ngModel)]="searchedValue" placeholder="Hasta Ara">
+        <span class="input-group-btn">
+          <button (click)="searchPatient()" title="Ara" type="button" class="btn btn-default btn-flat"><i class="glyphicon glyphicon-search"></i></button>
+        </span>
+      </div>
+    </div>
+  
+    <div class="col-md-8">
+      <h1>
+        <small>{{patientCredentials.name}} {{patientCredentials.surname}}</small>
+      </h1>
+    </div>
+  </div>
+</section>
+
+<section [hidden]="!isPatientExist" class="content">
+  <div class="row">
+
+    <!-- Medicals -->
+    <div class="col-md-4">  
+      <div class="box {{ boxColor }}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Ziyaretler</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button (click)="createEmptyMuayene()" type="button" title="Yeni Muayene Ekle" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>     
+              <button (click)="getPatientVisits()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-align-left"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li class="header" style="margin-left: 20px"><b>Liste Görünümü</b></li>
+                  <li><a (click)="filterPatientVisitByDoctor(true)">Sadece Kendi Muayenelerim</a></li>
+                  <li><a (click)="filterPatientVisitByDoctor(false)">Hepsini Göster</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="visitDataTable" [dtTrigger]="visitDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of visitDataTable.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow" class="form-group">
+                  <td (click)="getPatientVisitDetail(row.muayeneid)" *ngIf="row.islem == 'muayene'" style="vertical-align:middle;"> 
+                    <div style="float: left; margin-right: 15px">
+                      <img src="assets/images/muayene.png" width="30" height="30">                            
+                    </div>
+                    <div *ngIf="row.doktortc == currentDoctor" style="float: left">
+                      <b>{{row.doktorunvan}} {{row.doktoradi}} {{row.doktorsoyadi}}</b><br>{{row.tarih}} • {{row.sonuc}}
+                    </div>
+                    <div *ngIf="row.doktortc != currentDoctor" style="float: left">
+                      {{row.doktorunvan}} {{row.doktoradi}} {{row.doktorsoyadi}}<br>{{row.tarih}} • {{row.sonuc}}
+                    </div>
+                  </td>
+
+                  <td  *ngIf="row.islem == 'manuel_vizit'" style="vertical-align:middle;"> 
+                    <div style="float: left; margin-right: 15px">
+                      <img src="assets/images/manuel.png" width="30" height="30">                            
+                    </div>
+                    <div style="float: left">
+                      {{row.doktorunvan}} {{row.doktor}}<br>{{row.tarih}}
+                    </div>                          
+                  </td>
+
+                  <td *ngIf="row.islem == 'labistek'" style="vertical-align:middle;"> 
+                    <div style="float: left; margin-right: 15px">
+                      <img src="assets/images/lab.png" width="30" height="30">                            
+                    </div>
+                    <div style="float: left">
+                      <b>{{row.labkurumadi}}</b><br>{{row.aciklama}} • {{row.tarih}}
+                    </div>                         
+                  </td>
+
+                  <td *ngIf="row.islem == 'checkupistek'" style="vertical-align:middle;"> 
+                    <div style="float: left; margin-right: 15px">
+                      <img src="assets/images/checkup.png" width="30" height="30">                            
+                    </div>
+                    <div style="float: left">
+                      <b>{{row.islem}}</b> • {{row.tarih}}
+                    </div>                   
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>   
+
+          <div *ngIf="visitDataTable.dataRows.length == 0">
+            <label><i>Hasta ziyareti bulunamadı.</i></label>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Menu -->
+    <div [hidden]="isMedicalAddSelected" class="col-md-8">
+      <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#visit" data-toggle="tab">Muayene Kartı</a></li>
+          <li><a href="#history" data-toggle="tab">Geçmiş</a></li>
+          <li><a href="#data" data-toggle="tab">Ölçümler</a></li>
+          <li><a href="#profile" data-toggle="tab">Profil</a></li>      
+        </ul>
+
+        <div class="tab-content">   
+          <div class="tab-pane box box-solid active" id="visit">
+            <div class="box-body">  
+
+              <!-- Medical Examination Details -->
+              <div class="col-md-12" style="margin-bottom: 15px">
+                <label>Doktor : {{ (medical | async)?.doktorbilgi }}</label>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Tarih</label>
+                  <angular2-date-picker 
+                    [(ngModel)]="medicalDate" 
+                    [settings]="calendarSettings">
+                  </angular2-date-picker>
+                </div>
+
+                <div class="form-group">
+                  <label>Yakınma</label>
+                  <textarea class="form-control" rows="2" value="{{ (medical | async)?.yakinma }}" [(ngModel)]="medicalCredentials.yakinma"></textarea>           
+                </div>
+
+                <div class="form-group">
+                  <label>Öykü</label> 
+                  <textarea class="form-control" rows="3" value="{{ (medical | async)?.oyku }}" [(ngModel)]="medicalCredentials.oyku"></textarea>           
+                </div>
+
+                <div class="form-group">
+                  <label>Bulgular</label>
+                  <textarea class="form-control" rows="3" value="{{ (medical | async)?.bulgu }}" [(ngModel)]="medicalCredentials.bulgu"></textarea>                    
+                </div>
+                
+                <div class="form-group">
+                  <label>Sonuç</label>
+                  <textarea class="form-control" rows="3" value="{{ (medical | async)?.sonuc }}" [(ngModel)]="medicalCredentials.sonuc"></textarea>           
+                </div>
+
+                <div class="form-group">
+                  <label>Tanı</label>
+                  <textarea class="form-control" rows="2" value="{{ (medical | async)?.tani }}" [(ngModel)]="medicalCredentials.tani"></textarea>           
+                </div>
+
+                <div class="form-group">
+                  <label>Kontrol Tarihi</label>
+                  <angular2-date-picker
+                    [(ngModel)]="medicalControlDate" 
+                    [settings]="calendarSettings">
+                  </angular2-date-picker>
+                </div>
+
+                <div class="form-group">
+                  <label>Kontrol Notları</label>
+                  <textarea class="form-control" rows="3" value="{{ (medical | async)?.kontrolnotlari }}" [(ngModel)]="medicalCredentials.kontrolnotlari"></textarea>           
+                </div>
+
+                <div class="form-group">
+                  <label>Doktora Özel Notlar</label>
+                  <textarea class="form-control" rows="4" value="{{ (medical | async)?.notlar }}" [(ngModel)]="medicalCredentials.notlar"></textarea>                    
+                </div>
+              </div>
+  
+              <!-- Medical Examination's Fields -->
+              <div class="col-md-6">
+                <div *ngFor="let row of fields" class="form-group">
+                  <div *ngIf="row.sahatipi == 1">
+                    <label>{{ row.sahaadi }}</label>
+                    <input type="text" class="form-control" value="row.deger1" [(ngModel)]="row.deger1">
+                  </div>
+
+                  <div *ngIf="row.sahatipi == 2">
+                    <label>{{ row.sahaadi }}</label>
+                    <input type="text" mask="0000000000" class="form-control" value="row.deger1" [(ngModel)]="row.deger1">
+                  </div>
+                  
+                  <div *ngIf="row.sahatipi == 3">
+                    <label>{{ row.sahaadi }}</label>
+                    <input type="text" placeholder="2018-01-01" class="form-control" value="row.deger1" [(ngModel)]="row.deger1">
+                  </div>
+
+                  <div *ngIf="row.sahatipi == 4">
+                    <label>{{ row.sahaadi }}</label>
+                    <textarea type="text" rows="3" class="form-control" value="row.deger1" [(ngModel)]="row.deger1"></textarea>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Labs -->
+              <div class="col-md-12">
+                <div class="box {{boxColor}}">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-bar-chart"></i> Lab İstekleri</h3> 
+                    <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                  </div>
+                  <div class="box-body">
+                    <div [hidden]="!isCurrentDoctorsMedical" class="mailbox-controls">
+                      <div class="btn-group">
+                        <button type="button" title="Yeni Lab İsteği" data-toggle="modal" data-target="#labRequestModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                                                              
+                        <button (click)="getDocuments()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                      </div>
+                      </div>
+                    <div [hidden]="isCurrentDoctorsMedical" class="mailbox-controls">
+                      <button (click)="getDocuments()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                    </div>
+
+                    <div class="table-responsive mailbox-messages">
+                      <table datatable id="labDataTable" [dtTrigger]="labDtTrigger" [dtOptions]="dtOptions" class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of labDataTable.dataRows">
+                            <td style="vertical-align:middle;">{{ row.kurumadi }}<br> 
+                              <div *ngIf="row.durum == 1">
+                                Durum : Lab istek girildi.
+                              </div>
+                              <div *ngIf="row.durum == 2">
+                                Durum : Lab kabul etti.
+                              </div>
+                              <div *ngIf="row.durum == 3">
+                                Durum : Lab örnek aldı/çalışıyor.
+                              </div>
+                              <div *ngIf="row.durum == 4">
+                                Durum : Sonuçlandı.
+                              </div>
+                              <div *ngIf="row.durum == 5">
+                                Durum : Hatalı örnek.
+                              </div>
+                              <div *ngIf="row.durum == 6">
+                                Durum : Hasta gelmedi/reddetti.
+                              </div>
+                              {{ row.istektarih }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div *ngIf="labDataTable.dataRows.length == 0">
+                      <label><i>Muayeneye ait lab isteği bulunamadı.</i></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Documents -->
+              <div class="col-md-12">
+                <div class="box {{boxColor}}">
+                  <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-folder-open-o"></i> Belgeler</h3>
+                    <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                  </div>
+                  <div class="box-body">
+                    <div [hidden]="!isCurrentDoctorsMedical" class="mailbox-controls">
+                      <div class="btn-group">
+                        <button type="button" title="Yeni Belge Ekle" data-toggle="modal" data-target="#documentUploadModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                                                              
+                        <button (click)="getDocuments()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                      </div>
+                    </div>
+                    <div [hidden]="isCurrentDoctorsMedical" class="mailbox-controls">
+                      <button (click)="getDocuments()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                    </div>
+                    <div class="table-responsive mailbox-messages">
+                      <table datatable id="documentDataTable" [dtTrigger]="documentDtTrigger" [dtOptions]="dtOptions" class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of documentDataTable.dataRows">
+                            <td width="70" (click)="openDocumentUrl(row.url)" style="vertical-align:middle;">{{ row.baslik }}<br>
+                            <td width="25" (click)="openDocumentUrl(row.url)" style="text-align: right">{{ row.tarih }}</td>
+                            <td width="5%" (click)="openDocumentUrl(row.url)" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+  
+                    <div *ngIf="documentDataTable.dataRows.length == 0">
+                      <label><i>Muayeneye ait belge bulunamadı.</i></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Operations -->
+              <div class="form-group col-md-12" style="margin-top: 15px">
+                <div [hidden]="!isCurrentDoctorsMedical" class="pull-left">
+                  <button (click)="openDeleteMuayene()" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+                </div>
+                <div class="pull-right">
+                  <div [hidden]="!isCurrentDoctorsMedical"><button (click)="updateMuayene()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          
+          <div class="tab-pane box box-solid" id="history">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="box-body">
+                  <div class="mailbox-controls">
+                    <button title="Geçmiş Ekle" data-toggle="modal" data-target="#addHistoryModal" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+                    <button (click)="getPatientHistory()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>      
+                  </div>
+                  <div class="table-responsive mailbox-messages">
+                    <table datatable id="historyDataTable" [dtTrigger]="historyDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+                      <thead>
+                        <tr><th></tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let row of historyDataTable.dataRows">
+                          <td (click)="getPatientHistoryDetail(row.gecmisid)" width="25%" style="text-align: left"><b>{{ row.doktorbilgi }}</b> <br> {{ row.eklemetarihi }} </td>
+                          <td (click)="getPatientHistoryDetail(row.gecmisid)" width="35%"><i>Özgeçmiş: </i> {{ row.ozgecmis }}</td>
+                          <td (click)="getPatientHistoryDetail(row.gecmisid)" width="35%"><i>Soygeçmiş: </i> {{ row.soygecmis }}</td>
+                          <td (click)="getPatientHistoryDetail(row.gecmisid)" width="5%" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div *ngIf="historyDataTable.dataRows.length == 0">
+                    <label><i>Hasta geçmiş kaydı bulunamadı.</i></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane box box-solid" id="data">
+            <div class="row">
+
+              <div class="col-md-6">
+                <div class="box-body">
+                  <div class="mailbox-controls">
+                    <button type="button" title="Yeni Ölçüm Sahası Ekle" data-toggle="modal" data-target="#addPatientFieldModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+                    <button (click)="getPatientField()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>      
+                  </div>
+                  <div class="table-responsive mailbox-messages">
+                    <table datatable id="fieldDataTable" [dtTrigger]="fieldDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+                      <thead>
+                        <tr><th></tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let row of fieldDataTable.dataRows">
+                          <td width="70%" (click)="selectSaha(row.sahaid, row.sahaadi)" style="vertical-align:middle;">{{ row.sahaadi }}</td>
+                          <td width="25%" (click)="selectSaha(row.sahaid, row.sahaadi)" style="vertical-align:middle;">{{ row.eklenmetarihi }}</td>
+                          <td width="5%" (click)="selectSaha(row.sahaid, row.sahaadi)" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>                            
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div *ngIf="fieldDataTable.dataRows.length == 0">
+                    <label><i>Hasta ölçüm kaydı bulunamadı.</i></label>
+                  </div>
+                </div>  
+
+              </div>
+
+              <div [hidden]="!isSahaDetailSelected" class="col-md-6">
+                <div class="box-header with-border">
+                  <h3 class="box-title">{{ olcumTitle }} Verisi</h3>
+                </div>
+                <div class="box-body">
+                  <button type="button" title="Ölçüm Verisi Ekle" data-toggle="modal" data-target="#addPatientOlcumModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+                  <button *ngIf="!isFollowOlcumSelected" type="button" title="Takip Et" data-toggle="modal" data-target="#followOlcumModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-ok"></i></button>
+                  <button *ngIf="isFollowOlcumSelected" (click)="unFollowOlcum()" type="button" title="Takibi bırak" class="btn btn-default btn-sm disabled"><i class="glyphicon glyphicon-ok"></i></button>
+
+                  <div class="table-responsive mailbox-messages">
+                    <table datatable id="olcumDataTable" [dtTrigger]="olcumDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let row of olcumDataTable.dataRows">
+                          <td style="vertical-align: middle;"><b>{{ row.deger }} {{ row.birimi }}</b> </td>
+                          <td style="text-align: right">{{ row.olcumzamani }} </td>                            
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div *ngIf="olcumDataTable.dataRows.length == 0">
+                    <label><i>{{ olcumTitle }} verisi ile ilgili kayıt bulunamadı.</i></label>
+                  </div>
+                </div>  
+              </div>
+
+            </div>
+          </div>
+
+          <div class="tab-pane box box-solid" id="profile">
+            <div class="box-body">
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>T.C. Kimlik No</label>
+                  <input type="text" disabled class="form-control" value="{{ (user | async)?.tckimlik }}">                    
+                </div>
+
+                <div class="form-group">
+                  <label>İsim</label>
+                  <input type="text" disabled class="form-control" value="{{ (user | async)?.name }}">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Soyisim</label>
+                  <input type="text" disabled class="form-control" value="{{ (user | async)?.surname }}">                    
+                </div>
+
+                <div class="form-group">
+                  <label>E-posta</label>
+                  <input name="email" type="text" class="form-control" value="{{ (user | async)?.email }}" #email="ngModel" [(ngModel)]="patientCredentials.email" >                    
+                </div>
+
+                <div class="form-group">
+                  <label>Cinsiyet</label>
+                  <select class="form-control" #selectElem [(ngModel)]="patientCredentials.gender" name="gender">
+                    <option *ngFor="let gender of genders" [value]="gender">
+                      {{ gender }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Meslek</label>
+                  <input name="job" type="text" class="form-control" value="{{ (user | async)?.job }}" #job="ngModel" [(ngModel)]="patientCredentials.job" >                    
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Doğum Tarihi</label>
+                  <input name="birthdate" type="text" disabled class="form-control" value="{{ (user | async)?.birthdate }}">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Doğum Yeri</label>
+                  <input name="birthplace" type="text" class="form-control" value="{{ (user | async)?.birthplace }}" #birthplace="ngModel" [(ngModel)]="patientCredentials.birthplace">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Cep Telefonu</label>
+                  <input name="cellphone" type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" value="{{ (user | async)?.cellphone }}" #cellphone="ngModel" [(ngModel)]="patientCredentials.cellphone">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Ev Telefonu</label>
+                  <input name="homephone" type="text" mask="0000000000" placeholder="5xxx xxx xx xx" class="form-control" value="{{ (user | async)?.homephone }}" #homephone="ngModel" [(ngModel)]="patientCredentials.homephone">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Şehir</label>
+                  <input name="city" type="text" class="form-control" value="{{ (user | async)?.city }}" #city="ngModel" [(ngModel)]="patientCredentials.city">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Ülke</label>
+                  <input name="country" type="text" class="form-control" value="{{ (user | async)?.country }}" #country="ngModel" [(ngModel)]="patientCredentials.country">                    
+                </div>
+
+                <div class="form-group">
+                  <label>Adres</label>
+                  <textarea name="address" rows="3" class="form-control" value="{{ (user | async)?.address }}" #address="ngModel" [(ngModel)]="patientCredentials.address"></textarea>               
+                </div>
+              </div>
+
+              <div class="form-group col-md-12" style="margin-top: 15px">
+                <div class="pull-right">
+                  <button (click)="updatePatient()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab Request -->
+    <div class="modal modal-default fade" id="labRequestModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Lab İsteği</h4>
+          </div>
+          <div class="modal-body">
+
+              <form role="form" method="post">
+                <div class="box-body">
+
+                  <div class="form-group">
+                    <label>Kurum</label>
+                    <select class="form-control" #selectElem [(ngModel)]="labRequestredentials.kurumid" name="place">
+                      <option *ngFor="let place of places" [value]="place.kurumid">
+                        {{ place.kurumadi }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Açıklama</label>
+                    <input id="birthdate" name="birthdate" type="text" [(ngModel)]="labRequestredentials.aciklama" class="form-control">                    
+                  </div>
+
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <button (click)="closeModal('labRequestModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+            <button (click)="addLabrequest()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Gönder</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Uplaod -->
+    <div class="modal modal-default fade" id="documentUploadModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div [hidden]="!isProgressBar" class="progress progress-sm active">
+            <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            </div>
+          </div>
+          <div class="modal-header">
+            <h4 class="modal-title">Belge Yükleme</h4>
+          </div>
+          <div class="modal-body">
+            <form role="form" method="post">
+              <div class="box-body">
+                <div class="form-group">
+                  <input type="file" (change)="fileChange($event)" class="form-control" placeholder="Upload file" name="document">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('documentUploadModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="uploadDocument()" type="button" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Yükle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add History -->
+    <div class="modal modal-default fade" id="addHistoryModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Hastalık Geçmişi</h4>
+          </div>
+          <div class="modal-body">        
+            <div class="box-body">
+              <div class="form-group">
+                <label>Özgeçmiş</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="historyCredentials.ozgecmis"></textarea>                  
+              </div>
+
+              <div class="form-group">
+                <label>Soygeçmiş</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="historyCredentials.soygecmis"></textarea>                  
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('addHistoryModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addPatientHistory()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit History -->
+    <div class="modal modal-default fade" id="editHistoryModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><b>{{ (history | async)?.doktorbilgi }}</b> - {{ (history | async)?.eklemetarihi }}</h4>
+          </div>
+          <div class="modal-body">        
+            <div class="box-body">
+              <div class="form-group">
+                <label>Özgeçmiş</label>
+                <textarea class="form-control" rows="3" value="{{ (history | async)?.ozgecmis }}" [(ngModel)]="historyCredentials.ozgecmis"></textarea>                  
+              </div>
+
+              <div class="form-group">
+                <label>Soygeçmiş</label>
+                <textarea class="form-control" rows="3" value="{{ (history | async)?.soygecmis }}" [(ngModel)]="historyCredentials.soygecmis"></textarea>                  
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="pull-left">
+              <button (click)="deletePatientHistory()" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>
+            </div>
+            <div class="pull-right">
+              <button (click)="closeModal('editHistoryModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updatePatientHistory()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Patient Field -->
+    <div class="modal modal-default fade" id="addPatientFieldModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Yeni Ölçüm</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Ölçüm Adı</label>
+                    <input type="text" class="form-control" name="name" [(ngModel)]="patientFieldCredentials.name">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Ölçüm Tipi</label>
+                    <select class="form-control" #selectElem [(ngModel)]="patientFieldCredentials.type" name="type">
+                      <option *ngFor="let type of fieldTypes" [value]="type">
+                        {{ type }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Birimi</label>
+                    <input type="text" class="form-control" name="unit" [(ngModel)]="patientFieldCredentials.unit">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Boyut</label>
+                    <select class="form-control" #selectElem [(ngModel)]="patientFieldCredentials.size" name="size">
+                      <option *ngFor="let size of sizes" [value]="size">
+                        {{ size }}
+                      </option>
+                    </select>
+                  </div>
+  
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('addPatientFieldModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addPatientFiled()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow Olcum -->
+    <div class="modal modal-default fade" id="followOlcumModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Ölçüm Takip</h4>
+          </div>
+          <div class="modal-body">        
+            <form role="form" method="post">
+              <div class="box-body">
+
+                <div class="form-group">
+                  <label>Etkileşim Tipi</label>
+                  <select class="form-control" #selectElem [(ngModel)]="timeType" name="time" (change)="onChangeEtkilesim($event.target.value)">
+                    <option *ngFor="let time of timeTypes" [value]="time">
+                      {{time}}
+                    </option>
+                  </select>
+                </div>
+
+                <div [hidden]="!isPeriod" class="col-md-3">
+                  <label>Değer</label>
+                  <input type="text" class="form-control" id="sure" name="sure" [(ngModel)]="followOlcumCredentials.sure">
+                </div>
+
+                <div [hidden]="!isPeriod" class="form-group col-md-3">
+                  <label>Periyot Tipi</label>
+                  <select class="form-control" #selectElem [(ngModel)]="periodType" name="period" (change)="onChangePeriod($event.target.value)">
+                    <option *ngFor="let period of periodTypes" [value]="period">
+                      {{ period }}
+                    </option>
+                  </select>
+                </div>
+
+                <div [hidden]="!isFiltre" class="col-md-3">
+                  <label>Küçük :</label>
+                  <input type="text" class="form-control" id="kucukse" name="kucukse" [(ngModel)]="followOlcumCredentials.kucukse"/>
+                </div>
+
+                <div [hidden]="!isFiltre" class="col-md-3">
+                  <label>Büyük :</label>
+                  <input type="text" class="form-control" id="buyukse" name="buyukse" [(ngModel)]="followOlcumCredentials.buyukse"/>
+                </div>
+
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('followOlcumModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="followOLcum()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Patient Field -->
+    <div class="modal modal-default fade" id="addPatientOlcumModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{olcumTitle}}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <div class="form-group">
+                <label>Tarih</label>           
+                <angular2-date-picker 
+                  [(ngModel)]="olcumDate" 
+                  [settings]="calendarSettings">
+                </angular2-date-picker>   
+              </div>
+
+              <div *ngIf="olcumSize >= 1" class="form-group">
+                <label>{{olcumTitle}} Değer 1</label>
+                <input type="text" class="form-control" name="deger1" [(ngModel)]="patientOlcumCredentials.deger1">
+              </div>
+
+              <div *ngIf="olcumSize >= 2" class="form-group">
+                <label>{{olcumTitle}} Değer 2</label>
+                <input type="text" class="form-control" name="deger2" [(ngModel)]="patientOlcumCredentials.deger2">
+              </div>
+
+              <div *ngIf="olcumSize >= 3" class="form-group">
+                <label>{{olcumTitle}} Değer 3</label>
+                <input type="text" class="form-control" name="deger3" [(ngModel)]="patientOlcumCredentials.deger3">
+              </div>
+
+              <div *ngIf="olcumSize >= 4" class="form-group">
+                <label>{{olcumTitle}} Değer 4</label>
+                <input type="text" class="form-control" name="deger4" [(ngModel)]="patientOlcumCredentials.deger4">
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('addPatientOlcumModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addPatientOlcum()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

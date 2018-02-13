@@ -1,0 +1,149 @@
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box {{boxColor}}">
+
+        <div class="box-body table-responsive">
+          <button type="button" (click)="openModal2()" class="btn btn-default btn-sm" rel="tooltip" title="Sonuç gir ve belge yükle" data-placement="left">
+            <i class="fa fa-fw fa-pencil"></i>
+          </button>
+
+          <button class="btn btn-default btn-sm" (click)="getLabRequestAll()" rel="tooltip" title="Yenile" data-placement="left">
+            <i class="fa fa-fw fa-refresh"></i>
+          </button>
+          <table datatable id="labDataTable" [dtTrigger]="dtTrigger" class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" [(ngModel)]="isAllSelected" (change)="selectAll($event);" />
+                </th>
+                <th>{{ labDataTable.headerRow[0] }}</th>
+                <th>{{ labDataTable.headerRow[1] }}</th>
+                <th>{{ labDataTable.headerRow[2] }}</th>
+                <th>{{ labDataTable.headerRow[3] }}</th>
+                <th>{{ labDataTable.headerRow[4] }}</th>
+                <th>{{ labDataTable.headerRow[5] }}</th>
+                <th>{{ labDataTable.headerRow[6] }}</th>
+                <th>{{ labDataTable.headerRow[7] }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of labDataTable.dataRows;">
+                <td>
+                  <input type="checkbox" (click)="selectCheckBox(row.labistekid, row.doktortc, row.hastatc)"/>
+                </td>
+                <td style="vertical-align:middle;">
+                  <img *ngIf="row.durum == 1" src="assets/images/new.png" width="32px" height="32px">
+                  <img *ngIf="row.durum == 2" src="assets/images/check.png" width="32px" height="32px">
+                  <img *ngIf="row.durum == 3" src="assets/images/cancel.png" width="32px" height="32px">
+                </td>
+                <td style="vertical-align:middle;">{{ row.istektarih }}</td>
+                <td style="vertical-align:middle;">{{ row.doktorbilgi }}</td>
+                <td style="vertical-align:middle;">{{ row.hastabilgi }}</td>
+                <td style="vertical-align:middle;">{{ row.istem }}</td>                
+                <td style="vertical-align:middle;cursor:pointer;" (click)="openModal(row.labistekid, row.doktortc, row.hastatc, row.hastabilgi, row.doktorbilgi, row.istem, row.istektarih)">
+                  {{ row.aciklama }} <label *ngIf="row.aciklama == null">Sonuç gir</label></td>
+                <td style="vertical-align:middle;">{{ row.onaylayanbilgi }}</td>
+                <td style="vertical-align:middle;">
+                  <a *ngIf="row.belgeurl != null" href="{{ row.belgeurl }}" target="_blank">
+                    <button type="button" class="btn btn-default btn-sm" rel="tooltip" title="Belgeyi Aç">
+                      <i class="fa fa-fw fa-folder-open"></i>
+                    </button>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal modal-default fade" id="modal-lab">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Laboratuvar sonucu girin</h4>
+              </div>
+              <div class="modal-body">
+
+                <form role="form" method="post">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label>Doktor bilgileri</label>
+                      {{ doktorbilgileri }}
+                      <br>
+                      <label>İstem bilgileri</label>
+                      {{ istembilgileri }}
+                      <br>
+                      <label>Hasta bilgileri</label>
+                      {{ hastabilgileri }}
+                      <br>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Sonuç(Açıklama)</label>
+                      <textarea type="text" class="form-control" rows="4" name="aciklama" [(ngModel)]="aciklama" required></textarea>
+                    </div>
+
+                    <div class="img">
+                      <input type="file" (change)="labResultFile($event)" class="form-control" placeholder="PDF yükle" name="labbelge1">
+                    </div>
+
+                  </div>
+                </form>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="cancelLabRequest()" class="btn btn-primary cancel">İsteği iptal et</button>
+                <button type="button" (click)="updateLabRequestt()" class="btn btn-primary updatee">Sonuçlandır</button>
+                <button type="button" (click)="closeModalLabRequest()" class="btn btn-primary closee">Vazgeç</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal modal-default fade" id="modal-success">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Bildirim Oluştur</h4>
+              </div>
+              <div class="modal-body">
+
+                <form role="form" method="post">
+                  <div class="box-body">
+
+                    <div class="form-group">
+                      <label>Kime</label>
+                      <input type="text" class="form-control" name="othertckimlik" required disabled [(ngModel)]="sendNotificationCredentials.header">
+                    </div>
+
+                    <div class="form-group">
+                      <label>Başlık*</label>
+                      <input type="text" class="form-control" name="title" [(ngModel)]="sendNotificationCredentials.title" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label>İçerik*</label>
+                      <textarea class="form-control" name="message" rows="3" [(ngModel)]="sendNotificationCredentials.message" required></textarea>
+                    </div>
+
+                  </div>
+                </form>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="sendNotification()" class="btn btn-primary">Gönder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

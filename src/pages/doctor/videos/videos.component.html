@@ -1,0 +1,105 @@
+<section class="content-header">
+  <h1>
+    Videolar
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Videolar</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+    
+    <!-- Videos -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button type="button" data-toggle="modal" data-target="#videoUploadModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+              <button (click)="getVideos()" title="Yenile" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>   
+            </div>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows">
+                  <td width="%95" (click)="getVideo(row.url)" style="vertical-align:middle;"> 
+                    <h4>
+                      {{ row.baslik }}
+                      <small class="pull-right"><i class="fa fa-clock-o"></i> {{ row.gondermetarihi }}</small>
+                    </h4>
+                    <p>{{ row.aciklama }}</p>
+                    <div style="margin-top: 20px">
+                      <small style="color: #336699" class="pull-left"><i class="glyphicon glyphicon-thumbs-up"></i> {{ row.begenme }}</small>
+                      <small style="color: #336699; margin-left: 15px" class="pull-left"><i class="glyphicon glyphicon-eye-open"></i> {{ row.goruntuleme }}</small>
+                      <small style="color: #336699; margin-left: 15px" class="pull-left"><a href="{{row.url}}"><i class="glyphicon glyphicon-play"></i> İzle</a></small>
+                    </div>
+                  </td>
+                  
+                  <td width="5%" style="vertical-align: middle"><i (click)="deleteRequest(row.medyaid)" class="glyphicon glyphicon-trash" style="color: red"></i></td>                                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Videonuz bulunmamaktadır.</i></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Video Uplaod -->
+    <div class="modal modal-default fade" id="videoUploadModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Video Yükleme</h4>
+          </div>
+          <div class="modal-body">
+            <form role="form" method="post">
+              <div class="box-body">
+
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" class="form-control" name="baslik" [(ngModel)]="credentials.baslik">
+                </div>
+
+                <div class="form-group">
+                  <label>Açıklama</label>
+                  <input type="text" class="form-control" name="aciklama" [(ngModel)]="credentials.aciklama">
+                </div>
+
+                <div class="form-group">
+                  <label>Video Linki</label>
+                  <input type="text" class="form-control" name="aciklama" [(ngModel)]="credentials.medya">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('videoUploadModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="uploadVideo()" type="button" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> Yükle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

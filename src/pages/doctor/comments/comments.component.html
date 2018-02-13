@@ -1,0 +1,68 @@
+<section class="content-header">
+  <h1>
+    Yorumlar
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Medya Yorumları</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <!-- Comments -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button (click)="getComments()" title="Yenile" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            </div>    
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows">
+                  <td item-width="%95" (click)="getArticle(row.medyaid)" style="vertical-align:middle;"> 
+                    <h4>
+                      {{ row.baslik }}
+                      <small class="pull-right"><i class="fa fa-clock-o"></i> {{ row.gondermetarihi }}</small>
+                    </h4>
+                    <p> Yorum yapan : {{row.name}} {{row.surname}} <br>Yorum : {{ row.yorum }}</p>
+                    <div style="margin-top: 10px">
+                      <i *ngIf="row.puan >= 1" style="color:#f19b2c; margin-right: 0px" class="glyphicon glyphicon-star"></i>
+                      <i *ngIf="row.puan >= 2" style="color:#f19b2c; margin-right: 0px" class="glyphicon glyphicon-star"></i>
+                      <i *ngIf="row.puan >= 3" style="color:#f19b2c; margin-right: 0px" class="glyphicon glyphicon-star"></i>
+                      <i *ngIf="row.puan >= 4" style="color:#f19b2c; margin-right: 0px" class="glyphicon glyphicon-star"></i>
+                      <i *ngIf="row.puan >= 5" style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                    </div>
+                  </td>
+
+                  <td *ngIf="row.onay == '0'" width="5%" style="vertical-align: middle"><input id="check" (change)="change(row.medyayorumid, row.onay)" type="checkbox"></td>
+                  <td *ngIf="row.onay == '1'" width="5%" style="vertical-align: middle"><input id="check" (change)="change(row.medyayorumid, row.onay)" type="checkbox" checked></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Medyalarınıza yapılmış herhangi bir yorum bulunmamaktadır.</i></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,9 @@
+.table tr.active td {
+    background-color:#8aa4af !important;
+    color: #fff;
+}
+
+.preview img{
+    max-height: 50px;
+    border-radius: 50%;
+}

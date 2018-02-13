@@ -1,0 +1,276 @@
+<section class="content-header">
+  <h1>
+    Kullanıcılar
+    <small>Kullanıcı Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Kullanıcılar</li>
+  </ol> 
+</section>
+  
+<section class="content">     
+  <div class="row">
+
+    <!-- Users -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+            <h3 class="box-title"></h3>            
+          <div class="box-tools pull-right">
+            <div class="has-feedback">
+              <form (keydown)="search($event)">                                
+                <input id="value" name="value" type="text" #value="ngModel" [(ngModel)]="searchCredentials.value" class="form-control input-sm" placeholder="Ara">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" class="btn btn-default btn-sm"><input type="checkbox" [(ngModel)]="isAllSelected" (change)="selectAll($event);"/></button>  
+            <button (click)="openAddPanel()" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>  
+            <button (click)="reloadData()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            <button (click)="notificationClick()" data-toggle="modal" data-target="#sendNotificationModal" type="button" class="btn btn-default btn-sm"><i class="fa fa-envelope"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow" class="form-group">
+                  <td width="5%" style="vertical-align: middle"><input type="checkbox" (change)="change($event, row, i)" [(ngModel)]="selectedValues[i]"></td>
+                  <td width="90%" (click)="openEditPanel(row.tckimlik)" style="vertical-align:middle;"><b>{{ row.name }} {{ row.surname }}</b><div>{{ row.tckimlik }}</div></td>
+                  <td width="5%"style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>      
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Update User -->
+    <div *ngIf="updateSelected" class="col-md-8">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Kullanıcı Güncelleme</h3>
+        </div>
+        <div class="box-body">
+
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">Kişisel Bilgiler</h3>
+            </div>
+
+            <div class="box-body">
+
+              <div class="col-md-6">
+                <div class="form-group col-md-12">
+                  <label>T.C.*</label>
+                  <input type="text" class="form-control" name="tckimlik" value="{{ (user | async)?.tckimlik }}" disabled>
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>İsim*</label>
+                  <input id="name" name="name" type="text" class="form-control" #name="ngModel" required [(ngModel)]="updateCredentials.name" value="{{ (user | async)?.name }}"/>
+                  <div *ngIf="name.invalid && (name.dirty || name.touched)" style="color:red" class="alert">
+                    <div *ngIf="name.errors.required">Name is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Doğum Tarihi*</label>
+                  <my-date-picker
+                    [options]="datePickerOptions"
+                    [(ngModel)]="selectedDate">
+                  </my-date-picker>
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Doğum Yeri</label>
+                  <input type="text" class="form-control" [(ngModel)]="updateCredentials.birthplace" name="birthplace" value="{{ (user | async)?.birthplace }}">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group col-md-8">
+                  <label>Profil Resmi</label>
+                  <input type="file" (change)="fileChange($event)" class="form-control" placeholder="Upload file" name="photourl">
+                </div>
+
+                <div id="preview" class="img-responsive img-circle preview col-md-4">
+                  <img width="70px" height="70px" src="{{ updateCredentials.photourl }}">
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Soyisim*</label>
+                  <input id="surname" name="surname" type="text" class="form-control" #surname="ngModel" required [(ngModel)]="updateCredentials.surname" value="{{ (user | async)?.surname }}"/>
+                  <div *ngIf="surname.invalid && (surname.dirty || surname.touched)" style="color:red" class="alert">
+                    <div *ngIf="surname.errors.required">Surname is required.</div>
+                  </div>
+                </div> 
+
+                <div class="form-group col-md-6">
+                  <label>Cinsiyet</label>
+                  <input id="gender" name="gender" type="text" class="form-control" #gender="ngModel" disabled required [(ngModel)]="updateCredentials.gender" value="{{ (user | async)?.gender }}"/>
+                  <div *ngIf="surname.invalid && (surname.dirty || surname.touched)" style="color:red" class="alert">
+                    <div *ngIf="gender.errors.required">Gender is required.</div>
+                  </div>
+                </div> 
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">İletişim Bilgileri</h3>
+            </div>
+
+            <div class="box-body">
+
+              <div class="form-group col-md-6">
+                <div class="form-group col-md-6">
+                  <label>Cep Telefonu</label>
+                  <input type="text" class="form-control" [textMask]="{mask: phoneMask}" [(ngModel)]="updateCredentials.cellphone" name="cellphone" value="{{ (user | async)?.cellphone }}">
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Ev Telefonu</label>
+                  <input type="text" class="form-control" [textMask]="{mask: phoneMask}" [(ngModel)]="updateCredentials.homephone" name="homephone" value="{{ (user | async)?.homephone }}">
+                </div>
+
+                <div class="form-group col-md-12">
+                  <label>Adres</label>
+                  <textarea class="form-control" rows="3" [(ngModel)]="updateCredentials.address" name="address">{{ (user | async)?.address }}</textarea>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <div class="form-group col-md-12">
+                  <label>E-posta*</label>
+                  <input id="email" name="email" type="text" class="form-control" #email="ngModel" required [(ngModel)]="updateCredentials.email" value="{{ (user | async)?.email }}"/>
+                  <div *ngIf="email.invalid && (email.dirty || email.touched)" style="color:red" class="alert">
+                    <div *ngIf="email.errors.required">Email is required.</div>
+                  </div>             
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Şehir</label>
+                  <input type="text" class="form-control" [(ngModel)]="updateCredentials.city" name="city" value="{{ (user | async)?.city }}">
+                </div>
+
+                <div class="form-group col-md-6">
+                  <label>Ülke</label>
+                  <input type="text" class="form-control" [(ngModel)]="updateCredentials.country" name="country" value="{{ (user | async)?.country }}">
+                </div>
+
+              </div>
+
+            </div>
+            
+          </div>
+
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">Erişim İzinleri</h3>
+            </div>
+
+              <div class="box-body">
+                  <div class="form-group col-md-12">
+                    <label>Kullanıcı Rolleri*</label>
+                    <ng-select
+                      placeholder="Seçiniz"   
+                      [(ngModel)]="defaultRoles"         
+                      [multiple]="true"
+                      [options]="myOptions">
+                    </ng-select>  
+                </div>
+              </div>
+            
+          </div>
+
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-left">
+              <button (click)="deleteUser(updateCredentials.name, updateCredentials.tckimlik)" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateUser()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send Notification -->
+    <div class="modal modal-default fade" id="sendNotificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Yeni Bildirim</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Kime</label>
+                    <textarea type="text" class="form-control" name="othertckimlik" required disabled [(ngModel)]="sendNotificationCredentials.header"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Başlık*</label>
+                    <input type="text" class="form-control" name="title" [(ngModel)]="sendNotificationCredentials.title" required>
+                  </div>
+      
+                  <div class="form-group">
+                    <label>İçerik*</label>
+                    <textarea class="form-control" name="message" rows="3" [(ngModel)]="sendNotificationCredentials.message" required></textarea>                  
+                  </div>
+
+                  <div class="form-group">
+                    <div>
+                      <label>Mesaj Tipi*</label>
+                    </div>
+                    <select class="form-control" #selectElem [compareWith]="compareFn" [(ngModel)]="messageType" name="type">
+                      <option *ngFor="let type of messageTypeArray" [value]="type">
+                        {{type}}
+                      </option>
+                    </select>
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('sendNotificationModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="sendNotification()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-share-alt"></i> Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

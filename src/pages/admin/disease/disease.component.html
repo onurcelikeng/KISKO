@@ -1,0 +1,250 @@
+<section class="content-header">
+  <h1>
+    Hastalıklar
+    <small>Hastalık Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Hastalıklar</li>
+  </ol> 
+</section>
+
+<section class="content">   
+  <div class="row">
+
+    <!-- Disease Groups -->
+    <div class="col-md-6">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>
+
+          <div class="box-tools pull-right">
+            <div class="has-feedback">
+              <form (keydown)="search($event)">
+                <input id="value" name="value" type="text" #value="ngModel" [(ngModel)]="searchCredentials.value" class="form-control input-sm" placeholder="Ara">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" data-toggle="modal" data-target="#addDiseaseGroupModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button (click)="reloadDataTable1()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="dataTable1" [dtTrigger]="dtTrigger1" [dtOptions]="dtOptions1" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable1.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
+                  <td (click)="openRightPanel(row.hastalikgrupid)" style="vertical-align:middle;">{{ row.hastalikgrupadi }}</td>
+                  <td><button (click)="openDiseaseGroupPanel(row)" type="button" data-toggle="modal" data-target="#updateDiseaseGroupModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+     <!-- Diseases -->
+     <div *ngIf="diseaseSelected" class="col-md-6">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Hastalıklar</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" data-toggle="modal" data-target="#addDiseaseModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button (click)="reloadDataTable2()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger2" [dtOptions]="dtOptions2" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable2.dataRows">
+                  <td style="vertical-align:middle;">{{ row.hastalikadi }}</td>
+                  <td><button (click)="openDiseasePanel(row)" type="button" data-toggle="modal" data-target="#updateDiseaseModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button></td>                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Add Disease Group -->
+    <div class="modal modal-default fade" id="addDiseaseGroupModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Hastalık Grubu Oluştur</h4>
+          </div>
+          <div class="modal-body">
+
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Hastalık Grubu Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="addDiseaseGroupCredentials.name">                    
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <button (click)="closeModal('addDiseaseGroupModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+            <button (click)="addDiseaseGroup()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!-- Add Disease -->
+    <div class="modal modal-default fade" id="addDiseaseModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Hastalık Oluştur</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Hastalık Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="addDiseaseCredentials.name">                                        
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <button (click)="closeModal('addDiseaseModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+            <button (click)="addDisease()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Disease Group -->
+    <div class="modal modal-default fade" id="updateDiseaseGroupModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Hastalık Grubu Bilgileri</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Hastalık Grubu Id</label>
+                    <input id="id" name="id" type="text" class="form-control" disabled [(ngModel)]="updateDiseaseGroupCredentials.id">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Hastalık Grubu Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="updateDiseaseGroupCredentials.name">                    
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <div class="pull-left">
+              <button (click)="deleteDiseaseGroup()" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeModal('updateDiseaseGroupModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateDiseaseGroup()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Disease -->
+    <div class="modal modal-default fade" id="updateDiseaseModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Hastalık Bilgileri</h4>
+          </div>
+          <div class="modal-body">
+            
+              <form role="form" method="post">
+                <div class="box-body">
+
+                  <div class="form-group">
+                    <label>Hastalık Id</label>
+                    <input id="id" name="id" type="text" class="form-control" disabled [(ngModel)]="updateDiseaseCredentials.id">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Hastalık Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="updateDiseaseCredentials.name">                    
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+
+          <div class="modal-footer">
+            <div class="pull-left">
+              <button (click)="deleteDisease()" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeModal('updateDiseaseModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateDisease()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

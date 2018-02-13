@@ -1,0 +1,4 @@
+.table tr.active td {
+    background-color:#8aa4af !important;
+    color: #fff;
+}

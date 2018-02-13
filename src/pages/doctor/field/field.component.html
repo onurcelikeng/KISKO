@@ -1,0 +1,152 @@
+<section class="content-header">
+  <h1>
+    Muayene Kartı Sahalarım
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Muayene Kartı Sahalarım</li>
+  </ol> 
+</section>
+
+<section class="content">     
+  <div class="row">
+
+    <!-- Fields -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Sahalarım</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button (click)="openAddPanel()" title="Yeni Saha" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+              <button (click)="getFields()" title="Yenile" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            </div>
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
+                  <td width="95%" (click)="openUpdatePanel(row.doktorsahaid)" style="vertical-align:middle;">{{ row.sahaadi }}</td>
+                  <td width="5%" (click)="openUpdatePanel(row.doktorsahaid)" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>                                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Saha kaydınız bulunmamaktadır.</i></label>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Add Field -->
+    <div *ngIf="isAddSelected" class="col-md-5">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Saha Ekle</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="form-group col-md-4">
+            <label>Saha Adı</label>
+            <input type="text" class="form-control"  #name="ngModel" [(ngModel)]="addCredentials.name"/>           
+          </div>
+
+          <div class="form-group col-md-4">
+            <div>
+              <label>Saha Tipi</label>
+              <select class="form-control" #selectElem [compareWith]="compareFn" (change)="change(selectElem.value)" [(ngModel)]="selectedFieldType" name="fieldType" >
+                <option *ngFor="let type of fieldTypes" [ngValue]="type">
+                  {{type.sahatipi}}
+                </option>
+              </select>        
+            </div>
+          </div>
+
+          <div class="form-group col-md-4">
+            <div>
+              <label>Saha Sırası</label>
+              <select class="form-control" #selectElem [compareWith]="compareFn2" (change)="change(selectElem.value)" [(ngModel)]="selectedOrderType" name="orderType" >
+                <option *ngFor="let order of orderTypes" [ngValue]="order">
+                  {{order}}
+                </option>
+              </select>        
+            </div>
+          </div>
+      
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-left">
+              <button type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addField()" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Field -->
+    <div *ngIf="isUpdateSelected" class="col-md-5">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Saha Bilgileri</h3>       
+        </div>
+
+        <div class="box-body">
+          <div class="form-group col-md-4">
+            <label>Saha Adı</label>
+            <input type="text" class="form-control" #name="ngModel" [(ngModel)]="updateCredentials.name"/>           
+          </div>
+
+          <div class="form-group col-md-4">
+            <div>
+              <label>Saha Tipi</label>
+              <select class="form-control" #selectElem [compareWith]="compareFn" (change)="change(selectElem.value)" [(ngModel)]="selectedFieldType" name="fieldType" >
+                <option *ngFor="let type of fieldTypes" [ngValue]="type" [selected]="(fieldType | async)?.sahatipiid">
+                  {{type.sahatipi}}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group col-md-4">
+            <div>
+              <label>Saha Sırası</label>
+              <select class="form-control" #selectElem [compareWith]="compareFn2" (change)="change(selectElem.value)" [(ngModel)]="updateCredentials.order" name="orderType" >
+                <option *ngFor="let order of orderTypes" [ngValue]="order">
+                  {{order}}
+                </option>
+              </select>        
+            </div>
+          </div>
+
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-left">
+              <button (click)="deleteRequest()" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateField()" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

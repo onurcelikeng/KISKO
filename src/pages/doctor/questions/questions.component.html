@@ -1,0 +1,140 @@
+<section class="content-header">
+  <h1>
+      Sorular / Cevaplar
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Sorular / Cevaplar</li>
+  </ol>
+</section>
+
+<section class="content">     
+  <div class="row">
+
+    <!-- Questions -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <button (click)="getAllQuestions()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows; let i = index" (click)="setClickedRow(i); openQuestionDetail(i)" [class.active]="i == selectedRow" class="form-group">
+                  <td *ngIf="row.hastafoto != null" (click)="selectPatient(row.hastatc)" widht="10%" style="vertical-align:middle;"><img src="{{ row.hastafoto }}" style=" border-radius: 20px;" width="40" height="40"></td>
+                  <td *ngIf="row.hastafoto == null" (click)="selectPatient(row.hastatc)" widht="10%"></td>   
+                  <td *ngIf="row.puan == 5" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                    <br><i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                  </td>
+                  <td *ngIf="row.puan == 4" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                    <br><i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                  </td>
+                  <td *ngIf="row.puan == 3" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                    <br><i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                  </td>
+                  <td *ngIf="row.puan == 2" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                    <br><i style="color:#f19b2c" class="glyphicon glyphicon-star"></i> <i style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                  </td>
+                  <td *ngIf="row.puan == 1" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                    <br><i style="color:#f19b2c" class="glyphicon glyphicon-star"></i>
+                  </td>
+                  <td *ngIf="row.puan == 0" width="75%" style="vertical-align:middle;"> 
+                    <b> {{ row.hastaadi }} {{ row.hastasoyadi }}</b> 
+                    <br>{{row.sorutarihi}} 
+                    <br><span style="display:block;text-overflow: ellipsis;width: 500px;overflow: hidden; white-space: nowrap;" class="direct-chat-timestamp pull-left">{{ row.soru }}</span>
+                  </td>
+                  <td width="5%" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>                        
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Yakın zamanda sorulan sorunuz yoktur.</i></label>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Question Answer -->
+    <div [hidden]="!isAnswerSelected" class="col-md-4">
+      <div class="box {{boxColor}} direct-chat direct-chat-warning">
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>
+          <div class="box-tools pull-right">
+            <button (click)="closeQuestionDetail()" type="button" class="btn btn-box-tool"><i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="direct-chat-messages">
+            <div class="direct-chat-msg">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-left">{{ selectedQuestion.hastaadi }} {{ selectedQuestion.hastasoyadi }}</span>
+                <span class="direct-chat-timestamp pull-right">{{ selectedQuestion.sorutarihi }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{ selectedQuestion.hastafoto }}">
+              <div class="direct-chat-text">
+                {{ selectedQuestion.soru }}
+              </div>
+            </div>
+
+            <div *ngIf="isAnswared" class="direct-chat-msg right">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-right">{{ doctorName }}</span>
+                <span class="direct-chat-timestamp pull-left">{{ selectedQuestion.yanittarihi }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{ doctorPhoto }}">
+              <div class="direct-chat-text">
+                {{ selectedQuestion.yanit }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-footer">
+          <div class="input-group">
+            <input type="text" name="answer" (keyup.enter)="sendAnswer()" autocomplete="off" [(ngModel)]="questionCredentials.yanit" value="{{ questionCredentials.yanit }}" placeholder="Cevap yaz..." class="form-control">
+            <span class="input-group-btn">
+              <button (click)="sendAnswer()" type="button" class="btn btn-primary btn-flat">Gönder</button>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

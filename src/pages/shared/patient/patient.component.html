@@ -1,0 +1,182 @@
+<section class="content-header">
+  <h1>
+    Hastalar
+    <small>Hasta Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active"> Hastalar</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <!-- Patients -->
+    <div class="col-md-5">
+      <div class="box {{ boxColor }}">
+
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>
+          <div class="box-tools">
+            <div class="has-feedback">
+              <div class="input-group input-group-sm col-xs-5 pull-right">
+                <input name="value" type="text" (keyup.enter)="searchPatients()" #value="ngModel" [(ngModel)]="searchedValue" class="form-control input-sm" placeholder="Ara">
+                <span class="input-group-btn">
+                  <button (click)="searchPatients()" title="Ara" type="button" class="btn btn-default btn-flat"><i class="glyphicon glyphicon-search"></i></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <button type="button" title="Hepsini Seç" class="btn btn-default btn-sm"><input type="checkbox" [(ngModel)]="isAllSelected" (change)="selectAll($event);"/></button>  
+
+            <div class="btn-group">
+              <button type="button" title="Yeni Hasta" data-toggle="modal" data-target="#addPatientModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+              <button (click)="getPatients()" type="button" title="Yenile" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+              <button (click)="notificationButtonClick()" type="button" title="Bildirim Gönder" class="btn btn-default btn-sm"><i class="fa fa-comment-o"></i></button>            
+              <div class="btn-group">
+                <button type="button" title="Filtrele" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-align-left"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li class="header" style="margin-left: 20px"><b>Şuna Göre Sırala:</b></li>
+                  <li><a (click)="selectFilter('1')">İsime Göre (A-Z)</a></li>
+                  <li><a (click)="selectFilter('2')">İsime Göre (Z-A)</a></li>
+                  <li><a (click)="selectFilter('3')">Soyisime Göre (A-Z)</a></li> 
+                  <li><a (click)="selectFilter('4')">Soyisime Göre (Z-A)</a></li>                  
+                  <li><a (click)="selectFilter('5')">Son Muayene Tarihi (Önce En Yeni)</a></li>
+                  <li><a (click)="selectFilter('6')">Son Muayene Tarihi (Önce En Eski)</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" title="İleri" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" title="Geri" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive mailbox-messages">
+            <table datatable [dtTrigger]="patientsDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of patientsDataTable.dataRows; let i = index">
+                  <td width="5%" style="vertical-align: middle"><input type="checkbox" (change)="change($event, row, i)" [(ngModel)]="selectedValues[i]"></td>
+                  <td *ngIf="row.hastafoto != null" (click)="selectPatient(row.hastatc)" widht="10%" style="vertical-align:middle;"><img src="{{ row.hastafoto }}" style=" border-radius: 20px;" width="40" height="40"></td>
+                  <td *ngIf="row.hastafoto == null" (click)="selectPatient(row.hastatc)" widht="10%"></td>                  
+                  <td *ngIf="row.hastacinsiyet == 'Erkek'" (click)="selectPatient(row.hastatc)" width="80%" style="vertical-align:middle;"><b>{{ row.hastaadi }} {{ row.hastasoyadi }}</b> <br> {{ row.hastameslek }} • {{ row.hastayas }} •  <i class="fa fa-mars margin-r-5"></i></td>
+                  <td *ngIf="row.hastacinsiyet == 'Kadın'" (click)="selectPatient(row.hastatc)" width="80%" style="vertical-align:middle;"><b>{{ row.hastaadi }} {{ row.hastasoyadi }}</b> <br> {{ row.hastameslek }} • {{ row.hastayas }} •  <i class="fa fa-venus margin-r-5"></i></td>                  
+                  <td *ngIf="row.hastacinsiyet == 'null' || row.hastacinsiyet == null" (click)="selectPatient(row.hastatc)" width="80%" style="vertical-align:middle;"><b>{{ row.hastaadi }} {{ row.hastasoyadi }}</b> <br> {{ row.hastameslek }} • {{ row.hastayas }}</td>                         
+                  <td width="5%" (click)="selectPatient(row.hastatc)" style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="patientsDataTable.dataRows.length == 0">
+            <label><i>Hasta kaydı bulunamadı.</i></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Send Notification -->
+    <div class="modal modal-default fade" id="notificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Yeni Bildirim</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+  
+              <div class="form-group">
+                <label>Kime</label>
+                <textarea type="text" class="form-control" row="3" disabled [(ngModel)]="notificationCredentials.header"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Başlık</label>
+                <input type="text" class="form-control" name="title" [(ngModel)]="notificationCredentials.title">
+              </div>
+  
+              <div class="form-group">
+                <label>İçerik</label>
+                <textarea type="text" class="form-control" name="message" [(ngModel)]="notificationCredentials.message"></textarea>                  
+              </div>
+
+              <div class="form-group">
+                <div>
+                  <label>Mesaj Tipi</label>
+                </div>
+                <select class="form-control" #selectElem [(ngModel)]="notificationType" name="row">
+                  <option *ngFor="let row of notificationTypes" [value]="row">
+                    {{ row }}
+                  </option>
+                </select>
+              </div>
+  
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="pull-right">
+              <button (click)="closeModal('notificationModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="sendNotification()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-share-alt"></i> Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Patient -->
+    <div class="modal modal-default fade" id="addPatientModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Hasta Kayıt</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <div class="form-group">
+                <label>Hasta T.C.</label>
+                <input type="number" class="form-control" maxlength="11" [(ngModel)]="patientCredentials.tc">                    
+              </div>
+
+              <div [hidden]="!isPatientAdded" class="form-group">
+                <label>İsim</label>
+                <input id="name" name="name" type="text" class="form-control" [(ngModel)]="patientCredentials.name">                    
+              </div>
+
+              <div [hidden]="!isPatientAdded" class="form-group">
+                <label>Soyisim</label>
+                <input id="surname" name="surname" type="text" class="form-control" [(ngModel)]="patientCredentials.surname">                    
+              </div>
+
+              <div [hidden]="!isPatientAdded" class="form-group">
+                <label>Doğum Tarihi</label>
+                <my-date-picker
+                  [options]="datePickerOptions"
+                  [(ngModel)]="birthDate">
+                </my-date-picker>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button (click)="closeModal('addPatientModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+            <button (click)="addPatient()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

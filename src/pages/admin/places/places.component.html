@@ -1,0 +1,157 @@
+<section class="content-header">
+  <h1>
+    Kurumlar
+    <small>Kurum Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Kurumlar</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <!-- Places -->
+    <div class="col-md-4">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>            
+          <div class="box-tools pull-right">
+            <div class="has-feedback">
+              <form (keydown)="search($event)">
+                <input id="value" name="value" type="text" #value="ngModel" [(ngModel)]="searchCredentials.value" class="form-control input-sm" placeholder="Ara">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button (click)="openAddPanel()" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button (click)="reloadData()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
+                  <td item-width="95%" (click)="openEditPanel(row.kurumid)" style="vertical-align:middle;">{{ row.kurumadi }}</td>
+                  <td width="5%"style="vertical-align: middle"><i class="glyphicon glyphicon-chevron-right margin-r-5"></i></td>               
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Update Place -->
+    <div *ngIf="updateSelected" class="col-md-8">
+      <div class="box {{boxColor}}">
+
+        <div class="box-header with-border">
+          <h3 class="box-title">Kurum Bilgileri</h3>
+        </div>
+
+        <div class="box-body">
+
+          <div class="form-group col-md-6">
+            <label>Kurum Id</label>
+            <input id="id" name="id" type="text" class="form-control" #id="ngModel" disabled required [(ngModel)]="updateCredentials.id" value="{{ (place | async)?.id }}"/>           
+          </div>
+
+          <div class="form-group col-md-6">
+            <label>Kurum Adı</label>
+            <input id="name" name="name" type="text" class="form-control" #name="ngModel" required [(ngModel)]="updateCredentials.name" (change)="inputOnChange()" value="{{ (place | async)?.name }}"/>           
+          </div>
+
+          <div class="form-group col-md-6">
+            <div>
+                <label>Kurum Tipi</label>
+            </div>
+            <select class="form-control" #selectElem [compareWith]="compareFn" (change)="change(selectElem.value)" [(ngModel)]="selectedPlaceType" name="placeType" >
+              <option *ngFor="let type of colors" [ngValue]="type" [selected]="(placeType | async)?.kurumtipiid">
+                {{type.kurumtipi}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label>Adres</label>
+            <input id="address" name="address" type="text" class="form-control" #address="ngModel" required [(ngModel)]="updateCredentials.address" (change)="inputOnChange()" value="{{ (place | async)?.address }}"/>           
+          </div>
+      
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-left">
+              <button (click)="deletePlace(updateCredentials.name, updateCredentials.id)" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updatePlace()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Add Place -->
+    <div *ngIf="addSelected" class="col-md-8">
+        
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Kurum Ekle</h3>
+        </div>
+
+        <div class="box-body">
+
+          <div class="form-group col-md-6">
+            <label>Saha Adı</label>
+            <input type="text" class="form-control" #name="ngModel" [(ngModel)]="addCredentials.name"/>           
+          </div>
+
+          <div class="form-group col-md-6">
+            <div>
+                <label>Saha Tipi</label>
+            </div>
+            <select class="form-control" #selectElem [compareWith]="compareFn" (change)="change(selectElem.value)" [(ngModel)]="selectedPlaceType" name="placeType" >
+              <option *ngFor="let type of placeTypeArray" [ngValue]="type">
+                {{type.kurumtipi}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-12" style="margin-top: 15px">
+            <div class="pull-right">
+              <button (click)="closeRightPanel()" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="addPlace()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

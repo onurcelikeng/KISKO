@@ -1,0 +1,359 @@
+<aside class="main-sidebar">
+  <section class="sidebar">
+
+    <!-- Admin Sidebar Menu -->
+    <div *ngIf="currentRole === 'admin'">
+      <ul class="sidebar-menu">
+        <li class="header">MENU</li>          
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="glyphicon glyphicon-hdd"></i> <span>Sabit Veriler</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li [routerLinkActive]="['active']"><a routerLink="users">Kullanıcılar</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="places">Kurumlar</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="placetypes">Kurum Tipleri</a></li>           
+            <li [routerLinkActive]="['active']"><a routerLink="doctors">Doktorlar</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="diseases">Hastalıklar</a></li>               
+            <li [routerLinkActive]="['active']"><a routerLink="checkups">Checkup</a></li>       
+            <li [routerLinkActive]="['active']"><a routerLink="branchs">Branşlar</a></li>  
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="glyphicon glyphicon-bell"></i><span>Bildirim Sistemi</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li [routerLinkActive]="['active']"><a routerLink="systemnotifications">Sistem Bildirimleri</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="*">Yeni Bildirim</a></li>         
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="glyphicon glyphicon-list-alt"></i> <span>İçerik Yönetimi</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li [routerLinkActive]="['active']"><a routerLink="*">İçerik Onayları</a></li>       
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a href="#">
+            <i class="glyphicon glyphicon-eye-open"></i><span>Kılavuz</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a routerLink="notifications">
+            <i class="glyphicon glyphicon-bell"></i><span>Bildirimler</span>
+          </a>
+        </li>
+
+        <li class="header">HESAP</li>                  
+        
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="fa fa-exchange"></i> <span>Rol Değiştir</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li *ngFor="let role of userRoles; let i=index">
+              <a (click)="changeRole(role.rolenames)" *ngIf="role.rolenames != 'hasta'">
+                <i class="text-aqua"></i>{{ role.rolenames }}
+              </a>
+            </li>
+          </ul>
+        </li>
+  
+        <li [routerLinkActive]="['active']" class="treeview">
+            <a href="#"><i class="glyphicon glyphicon-cog"></i><span>Ayarlar</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li [routerLinkActive]="['active']"><a routerLink="profile">Profil</a></li>
+              <li [routerLinkActive]="['active']"><a routerLink="changepassword">Şifre Değiştirme</a></li>
+            </ul>
+          </li>
+
+        <li [routerLinkActive]="['active']">
+          <a (click)="cikis()">
+            <i class="glyphicon glyphicon-log-out"></i><span>Çıkış Yap</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Doctor Sidebar Menu -->
+    <div *ngIf="currentRole === 'doktor'">
+      <ul class="sidebar-menu">
+        <li class="header">MENU</li>                  
+          
+        <li [routerLinkActive]="['active']">
+          <a routerLink="medical">
+            <i class="fa fa-stethoscope"></i><span>Muayene</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a title="Muayene bilgileri, Ölçümler, Soygeçmiş, Hasta Profili" routerLink="patient">
+            <i class="fa fa-users"></i><span>Hastalarım</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a title="Aylık, haftalık ve günlük randevu görüntüle" routerLink="calender">
+            <i class="fa fa-calendar"></i><span>Randevu</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a href="#">
+            <i class="fa fa-book"></i><span>Raporlar</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a routerLink="notifications">
+            <i class="glyphicon glyphicon-bell"></i><span>Bildirimler</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a title="Bekleyen ve yanıtlanmış sorular, Cevap puanları" routerLink="questions">
+            <i class="glyphicon glyphicon-envelope"></i><span>Sorular / Cevaplar</span>
+          </a>
+        </li>
+        
+        <li class="header">HESAP</li>                  
+        
+        <li [routerLinkActive]="['active']">
+          <a title="Kişisel, Eğitim, İş Bilgileri" routerLink="promotion">
+            <i class="glyphicon glyphicon-globe"></i><span>Tanıtım</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="fa fa-exchange"></i> <span>Rol Değiştir</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li *ngFor="let role of userRoles; let i=index">
+              <a (click)="changeRole(role.rolenames)" *ngIf="role.rolenames != 'hasta'">
+                <i class="text-aqua"></i>{{ role.rolenames }}
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="glyphicon glyphicon-cog"></i><span>Ayarlar</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li [routerLinkActive]="['active']"><a routerLink="profile">Profil</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="articles">Makaleler</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="videos">Videolar</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="comments">Yorumlar</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="mysecretary">Sekreterim</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="changepassword">Şifre Değiştirme</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="calendartypes">Şablon Randevu Türleri</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="fields">Muayene Kartı</a></li>
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a (click)="cikis()">
+            <i class="glyphicon glyphicon-log-out"></i><span>Çıkış Yap</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+    <!-- Lab Sidebar Menu -->
+    <div *ngIf="currentRole === 'lab'">
+      <ul class="sidebar-menu">
+        <li class="header">MENU</li>                  
+          
+        <li [routerLinkActive]="['active']">
+          <a routerLink="labrequests">
+            <i class="glyphicon glyphicon-inbox"></i><span>İstekler</span>
+          </a>
+        </li>
+
+        <li class="header">HESAP</li>                  
+        
+        <li [routerLinkActive]="['active']">
+          <a routerLink="profile">
+            <i class="glyphicon glyphicon-user"></i><span>Profilim</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a routerLink="notifications">
+            <i class="glyphicon glyphicon-bell"></i><span>Bildirimler</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="fa fa-exchange"></i> <span>Rol Değiştir</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li *ngFor="let role of userRoles; let i=index">
+              <a (click)="changeRole(role.rolenames)">
+                <i class="text-aqua"></i>{{ role.rolenames }}
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a (click)="cikis()">                
+            <i class="glyphicon glyphicon-log-out"></i><span>Çıkış Yap</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+    <!-- Secretary Sidebar Menu -->
+    <div *ngIf="currentRole === 'sekreter'">
+      <ul class="sidebar-menu">
+        <li class="header">MENU</li>                  
+          
+        <li [routerLinkActive]="['active']">
+          <a routerLink="medical">
+            <i class="fa fa-stethoscope"></i><span>Muayene</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a title="Muayene bilgileri, Ölçümler, Soygeçmiş, Hasta Profili" routerLink="patient">
+            <i class="fa fa-users"></i><span>Hastalar</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a routerLink="calender">            
+            <i class="fa fa-calendar"></i><span>Randevu</span>
+          </a>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a href="#">
+            <i class="glyphicon glyphicon-tasks"></i><span>Raporlar</span>
+          </a>
+        </li>
+        
+        <li [routerLinkActive]="['active']">
+          <a routerLink="notifications">
+            <i class="glyphicon glyphicon-bell"></i><span>Bildirimler</span>
+          </a>
+        </li>
+
+        <li class="header">HESAP</li>                  
+        
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="fa fa-exchange"></i> <span>Rol Değiştir</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li *ngFor="let role of userRoles; let i=index">
+              <a (click)="changeRole(role.rolenames)" *ngIf="role.rolenames != 'hasta'">
+                <i class="text-aqua"></i>{{ role.rolenames }}
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']" class="treeview">
+          <a href="#"><i class="glyphicon glyphicon-cog"></i><span>Ayarlar</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li [routerLinkActive]="['active']"><a routerLink="profile">Profil</a></li>
+            <li [routerLinkActive]="['active']"><a routerLink="changepassword">Şifre Değiştirme</a></li>
+          </ul>
+        </li>
+
+        <li [routerLinkActive]="['active']">
+          <a (click)="cikis()">
+            <i class="glyphicon glyphicon-log-out"></i><span>Çıkış Yap</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+  </section>
+</aside>
+
+<div class="modal modal-default fade" id="changePasswordModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Şifre Değiştir</h4>
+      </div>
+      <div class="modal-body">
+        <div class="box-body">
+          <div class="form-group">
+            <label>Tarih</label>           
+            <angular2-date-picker 
+              [(ngModel)]="olcumDate" 
+              [settings]="calendarSettings">
+            </angular2-date-picker>   
+          </div>
+
+          <div *ngIf="olcumSize >= 1" class="form-group">
+            <label>{{olcumTitle}} Değer 1</label>
+            <input type="text" class="form-control" name="deger1" [(ngModel)]="patientOlcumCredentials.deger1">
+          </div>
+
+          <div *ngIf="olcumSize >= 2" class="form-group">
+            <label>{{olcumTitle}} Değer 2</label>
+            <input type="text" class="form-control" name="deger2" [(ngModel)]="patientOlcumCredentials.deger2">
+          </div>
+
+          <div *ngIf="olcumSize >= 3" class="form-group">
+            <label>{{olcumTitle}} Değer 3</label>
+            <input type="text" class="form-control" name="deger3" [(ngModel)]="patientOlcumCredentials.deger3">
+          </div>
+
+          <div *ngIf="olcumSize >= 4" class="form-group">
+            <label>{{olcumTitle}} Değer 4</label>
+            <input type="text" class="form-control" name="deger4" [(ngModel)]="patientOlcumCredentials.deger4">
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="pull-right">
+          <button (click)="closeModal('addPatientOlcumModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+          <button (click)="addPatientOlcum()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

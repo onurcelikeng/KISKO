@@ -1,0 +1,92 @@
+<section class="content-header">
+  <h1>
+    Randevu Türlerim
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Randevu Türlerim</li>
+  </ol> 
+</section>
+
+<section class="content">
+  <div class="row">
+
+    <!-- Add Appointment Type -->
+    <div class="col-md-3">
+      <div class="box box-solid">
+        <div class="box-header with-border">
+          <h3 class="box-title">Tür Ekle</h3>
+        </div>
+        <div class="box-body">
+          <div class="btn-group" style="width: 100%; margin-bottom: 10px;">
+            <ul class="fc-color-picker" id="color-chooser">
+              <li><a class="renk0" (click)="selectColor('renk0')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk1" (click)="selectColor('renk1')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk2" (click)="selectColor('renk2')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk3" (click)="selectColor('renk3')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk4" (click)="selectColor('renk4')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk5" (click)="selectColor('renk5')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk6" (click)="selectColor('renk6')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk7" (click)="selectColor('renk7')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk8" (click)="selectColor('renk8')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk9" (click)="selectColor('renk9')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk10" (click)="selectColor('renk10')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk11" (click)="selectColor('renk11')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk12" (click)="selectColor('renk12')"><i class="fa fa-square"></i></a></li>
+              <li><a class="renk13" (click)="selectColor('renk13')"><i class="fa fa-square"></i></a></li>
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Başlık" name="isim" [(ngModel)]="credetials.isim"/>           
+          </div>
+
+          <div class="form-group">
+            <select class="form-control" aria-placeholder="Süre" #selectElem [(ngModel)]="selectedTimeType" >
+              <option *ngFor="let time of timeTypes" [ngValue]="time">
+                {{time}} dakika
+              </option>
+            </select>        
+          </div>
+
+          <div class="form-group" style="margin-top: 15px">
+            <div class="pull-right">
+              <button (click)="addAppointmentType()" type="button" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Types -->
+    <div class="col-md-3">
+      <div class="box box-solid">
+        <div class="box-body">
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr><th><th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows">
+                  <td width="95%" style="vertical-align:middle;">
+                    {{ row.isim }} <br>
+                    <small><i class="fa fa-clock-o"></i> {{ row.sure }} dk.</small>                 
+                  </td>
+                  <td width="5%" (click)="deleteRequest(row.randevutipiid)" style="vertical-align: middle"><i class="glyphicon glyphicon-trash" style="color: red"></i></td>                                 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="dataTable.dataRows.length == 0">
+            <label><i>Randevu türü kaydınız bulunmamaktadır.</i></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

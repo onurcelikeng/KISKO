@@ -1,0 +1,170 @@
+
+<section class="content-header">
+  <h1>
+    Ayarlar
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Ayarlar</li>
+  </ol>
+</section>
+
+<section class="content">     
+  <div class="row">
+
+    <div class="col-md-3">
+      <div class="box box-primary">
+        <div class="box-body box-profile">
+          <img class="profile-user-img img-responsive img-circle" src="{{photo}}">
+
+          <h3 class="profile-username text-center">{{nameSurname}}</h3>
+          <p class="text-muted text-center">Software Engineer</p>
+
+          <ul class="list-group list-group-unbordered">
+            <li class="list-group-item">
+              <b>TC Kimlik No</b> <a class="pull-right">{{tc}}</a>
+            </li>
+            <li class="list-group-item">
+              <b>Doğum Tarihi</b> <a class="pull-right">22 Kasım 1993</a>
+            </li>
+            <li class="list-group-item">
+              <b>E-posta</b> <a class="pull-right">{{email}}</a>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+
+      <div class="box box-primary">
+        <div class="box-header with-border">
+          <h3 class="box-title">Hakkımda</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <strong><i class="fa fa-book margin-r-5"></i> Eğitim</strong>
+          <p class="text-muted">Dokuz Eylül Üniversitesi</p>
+          <hr>
+
+          <strong><i class="fa fa-map-marker margin-r-5"></i> Şehir</strong>
+          <p class="text-muted">İzmir, Türkiye</p>
+          <hr>
+
+          <strong><i class="fa fa-pencil margin-r-5"></i> Rollerim</strong>
+          <p>
+            <span class="label label-danger">Admin</span>
+            <span class="label label-success">Doktor</span>
+            <span class="label label-info">Sekreter</span>
+            <span class="label label-warning">Lab</span>
+            <span class="label label-primary">Hasta</span>
+          </p>
+          <hr>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#secretary" data-toggle="tab">Sekreterim</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-tape box box-solid active" id="secretary">
+            <div class="row box-body col-md-12">
+              <div class="mailbox-controls">
+                <button title="Sekreter Ekle" data-toggle="modal" data-target="#addSecretaryModal" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+              </div>
+              <div class="table-responsive mailbox-messages">
+                <table datatable [dtTrigger]="secretaryDtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+                  <thead>
+                    <tr><th></tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of secretaries">
+                      <td style="text-align: left"><b>{{ row.sekreter }}</b> <br> {{ row.sekretertc }} </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div *ngIf="secretaries.length == 0">
+                <label><i>Sekreter kaydı bulunamadı.</i></label>
+              </div>
+            </div>
+          </div>
+
+<!--
+          <div class="tab-tape box box-solid" id="profile">
+            <div class="row box-body">
+              <div class="form-group col-md-12">
+                <label>T.C. Kimlik No</label>
+                <input type="text" disabled class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>İsim</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Soyisim</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>E-posta</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Meslek</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Şehir</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Ülke</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-12">
+                <label>Adres</label>
+                <textarea type="text" rows="3" class="form-control"></textarea>                   
+              </div>
+                
+              <div class="form-group col-md-6">
+                <label>Doğum Tarihi</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Doğum Yeri</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Ev Telefonu</label>
+                <input type="text" class="form-control">                    
+              </div>
+    
+              <div class="form-group col-md-6">
+                <label>Cep Telefonu</label>
+                <input type="text" class="form-control">                    
+              </div>
+            </div>          
+          </div>
+-->
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,210 @@
+<section class="content-header">
+  <h1>
+    Checkups
+    <small>Checkup Detayları</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Checkups</li>
+  </ol> 
+</section>
+
+<section class="content">   
+  <div class="row">
+
+    <!-- Checkups -->
+    <div class="col-md-6">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title"></h3>
+          <div class="box-tools pull-right">
+            <div class="has-feedback">
+              <form>
+                <input id="value" name="value" type="text" #value="ngModel" [(ngModel)]="searchCredentials.value" class="form-control input-sm" placeholder="Ara">
+                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" data-toggle="modal" data-target="#addChecupModal" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button (click)="reloadData()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="dataTable" [dtTrigger]="dtTrigger" [dtOptions]="dtOptions" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of dataTable.dataRows">
+                  <td (click)="getCheckupExaminations(row.checkupid)" style="vertical-align:middle;">{{ row.checkupadi }}</td>
+                  <td><button (click)="openCheckupPanel(row)" type="button" data-toggle="modal" data-target="#updateChecupModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button></td>                                    
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Checkup Examinations -->
+    <div *ngIf="isCheckupSelected" class="col-md-6">
+      <div class="box {{boxColor}}">
+        <div class="box-header with-border">
+          <h3 class="box-title">Tetkikler</h3>
+        </div>
+
+        <div class="box-body">
+          <div class="mailbox-controls">
+
+            <button type="button" data-toggle="modal" data-target="#addDiseaseModal" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i></button>                
+            <button type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="dtTrigger2" [dtOptions]="dtOptions2" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of examinationDataTable.dataRows">
+                  <td style="vertical-align:middle;">{{ row.tetkikadi }}</td>
+                  <td><button type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button></td>                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Update Checkup -->
+    <div class="modal modal-default fade" id="updateChecupModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Checkup Bilgileri</h4>
+          </div>
+          <div class="modal-body">
+
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Id</label>
+                    <input id="id" name="id" type="text" class="form-control" disabled [(ngModel)]="updateCredentials.id">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="updateCredentials.name">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Ücret</label>
+                    <input id="price" name="price" type="text" class="form-control" [(ngModel)]="updateCredentials.price">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Birimi</label>
+                    <input id="unit" name="unit" type="text" class="form-control" [(ngModel)]="updateCredentials.unit">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Açıklama</label>
+                    <input id="description" name="description" type="text" class="form-control" [(ngModel)]="updateCredentials.description">                    
+                  </div>
+
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <div class="pull-left">
+              <button (click)="deleteCheckup()" type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> Sil</button>                
+            </div>
+            <div class="pull-right">
+              <button (click)="closeModal('updateChecupModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+              <button (click)="updateCheckup()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Checkup -->
+    <div class="modal modal-default fade" id="addChecupModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #dd4b39;">
+            <h4 class="modal-title" style="color: #ffffff;">Checkup Oluştur</h4>
+          </div>
+          <div class="modal-body">
+
+              <form role="form" method="post">
+                <div class="box-body">
+      
+                  <div class="form-group">
+                    <label>Adı</label>
+                    <input id="name" name="name" type="text" class="form-control" [(ngModel)]="addCredentials.name">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Ücret</label>
+                    <input id="price" name="price" type="text" class="form-control" [(ngModel)]="addCredentials.price">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Birimi</label>
+                    <input id="unit" name="unit" type="text" class="form-control" [(ngModel)]="addCredentials.unit">                    
+                  </div>
+
+                  <div class="form-group">
+                    <label>Açıklama</label>
+                    <input id="description" name="description" type="text" class="form-control" [(ngModel)]="addCredentials.description">                    
+                  </div>
+      
+                </div>
+              </form>
+
+          </div>
+          <div class="modal-footer">
+            <button (click)="closeModal('addChecupModal')" type="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Vazgeç</button>
+            <button (click)="addCheckup()" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i> Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

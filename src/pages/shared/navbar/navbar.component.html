@@ -1,0 +1,184 @@
+<header class="main-header">
+  <a class="logo">
+    <span class="logo-mini">           
+      <img style="margin-top: -3px" src="assets/images/kisko_logo.png" height="40" width="40">
+    </span>
+    <span style="margin-left: -40px" class="logo-lg"><b>
+      <img style="margin-top: -3px" src="assets/images/kisko_logo.png" height="40" width="40">
+      KISKO</b>{{title}}
+    </span>
+  </a>
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+      <span class="sr-only"></span>
+    </a>
+
+    <!-- Doctors of Secreter -->
+    <ul *ngIf="currentRole == 'sekreter'" class="nav navbar-nav">
+      <li class="dropdown user user-menu notifications-menu">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          <img src="http://www.websitesidoktor.com/resim/images/young-doctor-transparent-short.png" class="user-image" alt="User Image">
+          <span class="hidden-xs">{{currentDoctor}}</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="header"><b>Sekreteri olduğunuz doktorlar</b></li>
+          <li>
+            <ul class="menu">
+              <li *ngFor="let doctor of doctors; let i=index">
+                <a (click)="selectDoctor(doctor)">
+                  <i class="fa fa-users text-aqua"></i> {{ doctor.doktor }}
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+
+        <!-- Home -->
+        <li>
+          <a title="Anasayfa" [routerLink]="['patient']"><i class="glyphicon glyphicon-home"></i></a>
+        </li>
+
+        <!-- Calendar -->
+        <li *ngIf="currentRole == 'doktor' || currentRole == 'sekreter'">
+          <a title="Randevular" [routerLink]="['calender']"><i class="glyphicon glyphicon-calendar"></i></a>
+        </li>
+
+        <!-- Notifications -->
+        <li class="dropdown messages-menu">
+          <a title="Bildirimler" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="glyphicon glyphicon-bell"></i>
+            <span class="label label-danger">{{notifications.length}}</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="header">Okunmamış {{notifications.length}} bildiriminiz var.</li>
+            <li>
+              <ul class="menu">
+                <li *ngFor="let notification of notifications; let i=index">
+                  <a>
+                    <div class="pull-left">
+                      <img src="{{ notification.imageurl }}" class="img-circle">
+                    </div>
+                    <h4>
+                      {{ notification.title }}
+                      <small><i class="fa fa-clock-o"></i> {{ notification.date }}</small>
+                    </h4>
+                    <p>{{ notification.message }}</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="footer"><a [routerLink]="['notifications']">Hepsini gör</a></li>
+          </ul>
+        </li>
+      
+        <!-- Chats -->
+        <li *ngIf="currentRole == 'sekreter' || currentRole == 'doktor'">
+          <a title="Kisko Chat" data-toggle="control-sidebar"><i class="fa fa-comments"></i></a>
+        </li>
+
+        <li class="dropdown user user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img src="{{ photo }}" class="user-image" alt="User Image">
+            <span class="hidden-xs">{{nameSurname}}</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="user-header">
+              <img src="{{ photo }}" class="img-circle" alt="User">
+              <p>
+                {{nameSurname}}<small>{{email}}</small>
+              </p>
+            </li>
+
+            <li class="user-footer">
+              <div class="pull-left">
+                <a [routerLink]="['profile']" class="btn btn-default btn-flat">Profilim</a>
+              </div>
+              <div class="pull-right">
+                <a type="submit" (click)="cikis()" class="btn btn-default btn-flat">Çıkış Yap</a>
+              </div>
+            </li>
+          
+          </ul>
+        </li>
+      
+      </ul>
+    </div>
+  </nav>  
+
+  <aside class="control-sidebar">
+    <div class="box box-default">
+      <div class="box-header with-border" style="background-color: #E8E8E8">
+        <h3 class="box-title">Kisko Chat</h3>
+      </div>
+
+      <div class="box-body" style="background-color: #E8E8E8">
+        <div id="chatList" class="direct-chat-messages" style="background-color: #E8E8E8">
+          <li style="list-style-type: none" *ngFor="let chat of chats">
+            
+            <div *ngIf="currentRole == 'sekreter' && chat.tckimlik == currentTc" class="direct-chat-msg right">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-left">{{ chat.sender}}</span>
+                <span class="direct-chat-timestamp pull-right">{{ chat.date }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{chat.imageurl}}">
+              <div class="direct-chat-text">
+                {{ chat.message }}
+              </div>
+            </div>
+
+            <div *ngIf="currentRole == 'sekreter' && chat.tckimlik == doctorTc" class="direct-chat-msg">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-right">{{chat.sender}}</span>
+                <span class="direct-chat-timestamp pull-left">{{ chat.date }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{chat.imageurl}}">
+              <div class="direct-chat-text">
+                {{ chat.message }}
+              </div>
+            </div>
+
+            <div *ngIf="currentRole == 'doktor' && chat.tckimlik == secretaryTc" class="direct-chat-msg">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-left">{{ chat.sender}}</span>
+                <span class="direct-chat-timestamp pull-right">{{ chat.date }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{chat.imageurl}}">
+              <div class="direct-chat-text">
+                {{ chat.message }}
+              </div>
+            </div>
+
+            <div *ngIf="currentRole == 'doktor' && chat.tckimlik == currentTc" class="direct-chat-msg right">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-right">{{chat.sender}}</span>
+                <span class="direct-chat-timestamp pull-left">{{ chat.date }}</span>
+              </div>
+              <img class="direct-chat-img" src="{{chat.imageurl}}">
+              <div class="direct-chat-text">
+                {{ chat.message }}
+              </div>
+            </div>
+
+          </li>
+        </div>
+      </div>
+
+      <div class="box-footer" style="background-color: #E8E8E8">
+        <div class="input-group">
+          <input class="form-control" (keyup.enter)="sendMessage()" autocomplete="off" type="text" name="message" [(ngModel)]="message">
+          <span class="input-group-btn">
+            <button (click)="sendMessage()" type="button" class="btn btn-warning btn-flat"><i class="fa fa-send-o"></i></button>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</header>

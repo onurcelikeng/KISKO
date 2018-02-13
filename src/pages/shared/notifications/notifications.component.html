@@ -1,0 +1,69 @@
+<section class="content-header">
+  <h1>
+    Bildirimlerim
+    <small>Tüm Bildirimlerim</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a><i class="fa fa-dashboard"></i> Anasayfa</a></li>
+    <li class="active">Bildirimlerim</li>
+  </ol> 
+</section>
+
+<section class="content">           
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="box {{boxColor}}">
+        <div class="box-body">
+          <div class="mailbox-controls">
+            <div class="btn-group">
+              <button (click)="getMyNotifications()" type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-align-left"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li (click)="filterNotifications('0')"><a>Hepsi</a></li>
+                  <li (click)="filterNotifications('1')"><a>Genel</a></li>
+                  <li (click)="filterNotifications('2')"><a>Hatırlatma</a></li>
+                  <li (click)="filterNotifications('3')"><a>Doktor Onayı</a></li>                
+                  <li (click)="filterNotifications('4')"><a>Aile Bağı</a></li>
+                  <li (click)="filterNotifications('5')"><a>Randevu</a></li>
+                  <li (click)="filterNotifications('6')"><a>Soru / Yanıt</a></li>
+                  <li (click)="filterNotifications('7')"><a>Kisko Chat</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="pull-right">
+              <div class="btn-group">
+                <button (click)="pagination('back')" type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
+                <button (click)="pagination('next')" type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive mailbox-messages">
+            <table datatable id="datatables" [dtTrigger]="notificationDtTrigger" [dtOptions]="notificationDtOptions" class="table table-hover table-striped">
+                <thead>
+                  <tr><th></tr>
+                </thead>
+              <tbody>
+                <tr *ngFor="let row of notificationDataTable.dataRows">
+                  <td *ngIf="row.imageurl != null" widht="20%" style="vertical-align: top;"><img src="{{ row.imageurl }}" style="border-radius: 20px;" width="40" height="40"></td>
+                  <td *ngIf="row.imageurl == null" widht="20%"></td>
+                  <td widht="80%" style="vertical-align: left;"><b>{{ row.sender }}</b> <br> {{row.title}} • {{row.date}}<br><br> {{row.message}} </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="notificationDataTable.dataRows.length == 0">
+            <label><i>Yaşasın! Bildirim kutunuz boş.</i></label>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
